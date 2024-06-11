@@ -1,0 +1,29 @@
+{
+  "name": "8-bit-heart",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "nodemon src/index.ts"
+  },
+  "dependencies": {
+    "@slack/bolt": "^3.18.0",
+    "@types/express": "^4.17.21",
+    "axios": "^1.7.2",
+    "colors": "^1.4.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "js-yaml": "^4.1.0",
+    "nodemon": "^3.0.3",
+    "postgres": "^3.4.4",
+    "tsx": "^4.9.3",
+    "yaml": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
