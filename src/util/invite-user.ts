@@ -16,9 +16,9 @@ async function inviteGuestToSlack({ email, channels }) {
     channels: channels.join(","),
   });
 
-  return axios({
+  return await axios({
     method: "POST",
-    url: `https://slack.com/api/users.admin.inviteBulk`,
+    url: `https://slack.com/api/users.admin.invite`,
     headers: {
       Cookie: cookieValue,
       "Content-Type": "application/json",
@@ -29,11 +29,19 @@ async function inviteGuestToSlack({ email, channels }) {
     .then((response) => {
       return response.data;
     })
-    .catch((error) => {});
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
-export async function inviteUser({ email }) {
-  const channels = ["C06T7A8E3", "C06SBHMQU8G", "C06U5U9ADGD"];
+let channels = [
+  "C01504DCLVD", // #scrapbook
+  "C06U5U9ADGD", // #power-hour-bts
+  "C06SBHMQU8G", // #hack-hour
+];
 
+async function inviteUser({ email }) {
   return await inviteGuestToSlack({ email, channels });
 }
+
+module.exports = { inviteUser };
