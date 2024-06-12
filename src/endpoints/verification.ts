@@ -34,7 +34,7 @@ export async function verification(req: Request, res: Response) {
     if (verifiedUsersEmails.includes(email)) {
       res.status(200).send({ verified: true });
     } else {
-      res.status(401).send({ verified: false });
+      res.status(200).send({ verified: false });
     }
   }
 }
