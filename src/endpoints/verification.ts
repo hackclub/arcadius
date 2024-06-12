@@ -31,10 +31,15 @@ export async function verification(req: Request, res: Response) {
     res.status(401).send({ message: "Unauthorized" });
     return;
   } else {
-    if (verifiedUsersEmails.includes(email)) {
-      res.status(200).send({ verified: true });
+    if (!body.email) {
+      res.status(400).send({ message: "Email is required" });
+      return;
     } else {
-      res.status(200).send({ verified: false });
+      if (verifiedUsersEmails.includes(email)) {
+        res.status(200).send({ verified: true });
+      } else {
+        res.status(200).send({ verified: false });
+      }
     }
   }
 }
