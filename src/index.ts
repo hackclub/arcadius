@@ -7,6 +7,7 @@ import express from "express";
 
 import { health } from "./endpoints/health";
 import { index } from "./endpoints/index";
+import { verification } from "./endpoints/verification";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -23,6 +24,7 @@ receiver.router.use(express.json());
 receiver.router.get("/", index);
 receiver.router.get("/ping", health);
 receiver.router.get("/up", health);
+receiver.router.post("/verify", verification);
 
 const logStartup = async (app: App) => {
   await app.client.chat.postMessage({
