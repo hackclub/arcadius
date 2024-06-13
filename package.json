@@ -20,6 +20,7 @@
     "express": "^4.19.2",
     "js-yaml": "^4.1.0",
     "node-fetch": "^3.3.2",
+    "node-statsd": "^0.1.1",
     "nodemon": "^3.0.3",
     "postgres": "^3.4.4",
     "tsx": "^4.9.3",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
+    "@types/node-statsd": "^0.1.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   }

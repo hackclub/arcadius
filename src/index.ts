@@ -6,6 +6,7 @@ import colors from "colors";
 import { CronJob } from "cron";
 import express from "express";
 
+import metrics from "./metrics";
 import { health } from "./endpoints/health";
 import { index } from "./endpoints/index";
 import { slackInvite } from "./endpoints/slack-invite";
@@ -102,6 +103,10 @@ const logStartup = async (app: App) => {
         );
       })
       .then(async () => {
+        new CronJob("0 * * * * *", async function() {
+          metrics.increment("heartbeat")
+        }, null, true, "America/New_York")
+
         new CronJob(
           "*/3 * * * * *",
           async function () {
