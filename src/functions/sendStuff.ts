@@ -55,7 +55,7 @@ The Hack Club Slack is a grand labyrinth with hundreds of channels. For now, we'
 
 *Type \`/hack\` to begin!*
 
-One more thing… please make sure to complete the <https://hack.club/arcade-verify?prefill_Hack+Club+Slack+ID=${userId}&hide_Hack+Club+Slack+ID=true|age verification form>!`,
+One more thing… please make sure to complete the <https://hack.club/arcade-eligibility?slack_id=${userId}|eligibility verification form>!`,
         },
       },
     ],
