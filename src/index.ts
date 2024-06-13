@@ -12,18 +12,21 @@ import { slackInvite } from "./endpoints/slack-invite";
 import { tmp } from "./endpoints/tmp";
 import { verification } from "./endpoints/verification";
 import {
+  getFirstPurchaseUsers,
   getHoursUsers,
+  getInvitationFaults,
   getVerifiedUsers,
   hoursAirtable,
 } from "./functions/airtable";
 import { fetchUsers } from "./functions/jankySlackCrap";
 import {
   sendAlreadyVerifiedDM,
+  sendFirstPurchaseSubmittedDM,
   sendInitalDM,
-  sendStep3DM,
   sendVerificationDM,
 } from "./functions/sendStuff";
 import { arcadeStartInteraction } from "./interactions/arcade-start";
+import { inviteUser } from "./util/invite-user";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -56,16 +59,8 @@ app.action(/.*?/, async (args) => {
       await arcadeStartInteraction({ ...args, payload: { user } });
       break;
 
-    case "fake_it_forward_unverified":
-      await sendVerificationDM(client, user);
-      break;
-
-    case "fake_it_forward_verified":
-      await sendAlreadyVerifiedDM(client, user);
-      break;
-
     case "fake_it_final":
-      await sendStep3DM(client, user);
+      await sendFirstPurchaseSubmittedDM(client, user);
       break;
   }
 });
@@ -160,49 +155,100 @@ const logStartup = async (app: App) => {
               return minutesApproved / 60 >= 5;
             });
 
-            // check if the user has advancedToStepTwo === true
+            let tmp = await getVerifiedUsers();
+
+            // make an array of 'Hack Club Slack ID's
+            let verifiedUsers = tmp.map((user) => user["Hack Club Slack ID"]);
+
+            // check if the user has fiveHoursCompleted === true
             // if not, send them a DM
             if (usersWithMoreThan5Hours.length > 0) {
               usersWithMoreThan5Hours.forEach(async (user) => {
-                // TODO ~ Handle Cases where user is already a full user. This should silently error (skip) as it will be caught by ops during the order stage, but we need to handle this to prevent this bot dm'ing the user at any stage
+                // console.log(user);
+                // console.log(user["Slack ID"], user["verificationDmSent"]);
 
-                if (user["advancedToStepTwo"] === true) {
+                if (
+                  user["verificationDmSent"] === true &&
+                  user["isFullUser"] === true
+                ) {
                   return;
                 } else {
-                  try {
-                    let tmp = await getVerifiedUsers();
+                  if (user["isFullUser"] === true) {
+                    return;
+                  } else {
+                    if (user["verificationDmSent"] !== true) {
+                      if (
+                        verifiedUsers.includes(user["Slack ID"]) &&
+                        user["verificationDmSent"]
+                      ) {
+                        await sendAlreadyVerifiedDM(
+                          app.client,
+                          user["Slack ID"]
+                        ).then(() => {
+                          // upgradeUser(user["Slack ID"]);
+                        });
+                      } else {
+                        await sendVerificationDM(app.client, user["Slack ID"]);
+                      }
 
-                    // make an array of 'Hack Club Slack ID's
-                    let verifiedUsers = tmp.map(
-                      (user) => user["Hack Club Slack ID"]
-                    );
+                      try {
+                        const userRec = await hoursAirtable
+                          .select({
+                            filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
+                            pageSize: 1,
+                          })
+                          .firstPage();
 
-                    if (verifiedUsers.includes(user["Slack ID"])) {
-                      await sendAlreadyVerifiedDM(app.client, user["Slack ID"]);
+                        await hoursAirtable.update(userRec[0].id, {
+                          verificationDmSent: true,
+                        });
+                      } catch (err) {
+                        console.error(colors.red(`Error: ${err}`));
+                      }
                     } else {
-                      await sendVerificationDM(app.client, user["Slack ID"]);
+                      return;
                     }
-                    try {
-                      // find the airtable record for the user
-                      const userRec = await hoursAirtable
-                        .select({
-                          filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
-                          pageSize: 1,
-                        })
-                        .firstPage();
-                      // update the record
-                      await hoursAirtable.update(userRec[0].id, {
-                        advancedToStepTwo: true,
-                      });
-                    } catch (err) {
-                      console.error(colors.red(`Error updating user: ${err}`));
-                    }
-                  } catch (err) {
-                    console.error(colors.red(`Error: ${err}`));
                   }
                 }
               });
             }
+          }, // onTick
+          null, // onComplete
+          true, // start
+          "America/New_York" // timeZone
+        );
+
+        // Routinely check for invitation faults
+        new CronJob(
+          "*/5 * * * * *",
+          async function () {
+            const uninvitedUsers = await getInvitationFaults();
+
+            uninvitedUsers.forEach((record) => {
+              let email = record.get("Email");
+
+              inviteUser({ email });
+            });
+          }, // onTick
+          null, // onComplete
+          true, // start
+          "America/New_York" // timeZone
+        );
+
+        // Poll for users who need to be congratulated on their first purchase from the store
+        new CronJob(
+          "*/5 * * * * *",
+          async function () {
+            const users = await getFirstPurchaseUsers();
+
+            users.forEach((record) => {
+              sendFirstPurchaseSubmittedDM(app.client, record.get("Slack ID"));
+
+              // Update the associated record for this user in the hoursAirtable to set firstPurchaseSubmitted to true
+              hoursAirtable.update(record.id, {
+                firstPurchaseSubmitted: true,
+              });
+            });
           }, // onTick
           null, // onComplete
           true, // start

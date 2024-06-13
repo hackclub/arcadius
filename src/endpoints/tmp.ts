@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { fetchUsers } from "../functions/jankySlackCrap";
+import { client } from "../index";
+import { upgradeUser } from "../util/upgrade-user";
 // import { getUserHours } from "../functions/airtable";
 
 export async function tmp(req: Request, res: Response) {
@@ -8,5 +9,11 @@ export async function tmp(req: Request, res: Response) {
   let body = req.body;
   let { email } = body;
 
-  fetchUsers(email);
+  // fetchUsers(email);
+
+  await upgradeUser(client, email).then((result) => {
+    console.log(result);
+  });
+
+  // await getVerificationsUsers();
 }

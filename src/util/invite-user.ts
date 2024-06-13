@@ -1,10 +1,10 @@
 import axios from "axios";
 
 async function inviteGuestToSlack({ email, channels }) {
-  const cookieValue = `d=${process.env.SLACK_COOKIE}`;
+  const cookieValue = `d=${process.env.ARCADIUS_SLACK_COOKIE}`;
 
   const data = JSON.stringify({
-    token: process.env.SLACK_BROWSER_TOKEN,
+    token: process.env.ARCADIUS_SLACK_BROWSER_TOKEN,
     invites: [
       {
         email,
@@ -23,7 +23,7 @@ async function inviteGuestToSlack({ email, channels }) {
       Cookie: cookieValue,
       "User-Agent": "jasper@hackclub.com",
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.SLACK_BROWSER_TOKEN}`,
+      Authorization: `Bearer ${process.env.ARCADIUS_SLACK_BROWSER_TOKEN}`,
     },
     data,
   })
@@ -39,6 +39,7 @@ let channels = [
   "C01504DCLVD", // #scrapbook
   "C077TSWKER0", // #arcade-help
   "C06SBHMQU8G", // #hack-hour
+  // "C078CMYMW4R", // #arcade-lounge
 ];
 
 export async function inviteUser({ email }) {

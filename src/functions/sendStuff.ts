@@ -28,9 +28,6 @@ async function postAudio(client) {
       "User-Agent": "jasper@hackclub.com",
     },
   });
-  console.log({
-    channel: "C077MH3QRFU",
-  });
   const response = await client.files.uploadV2({
     channel: "C077MH3QRFU",
     file: file.data,
@@ -58,31 +55,8 @@ The Hack Club Slack is a grand labyrinth with hundreds of channels. For now, we'
 
 *Type \`/hack\` to begin!*
 
-One more thing… please make sure to complete the <https://forms.hackclub.com/arcade-age-verification|age verification form>!`,
+One more thing… please make sure to complete the <https://hack.club/arcade-verify?prefill_Hack+Club+Slack+ID=${userId}&hide_Hack+Club+Slack+ID=true|age verification form>!`,
         },
-      },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "Fake it forward (U)",
-              emoji: true,
-            },
-            value: "fake_it_forward_unverified",
-          },
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "Fake it forward (V)",
-              emoji: true,
-            },
-            value: "fake_it_forward_verified",
-          },
-        ],
       },
     ],
   });
@@ -96,22 +70,8 @@ async function sendVerificationDM(client, userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `Congratulations on completing your first five hours! Before you can move on to Step 3, we do need you to complete that <https://forms.hackclub.com/arcade-age-verification|age verification>. Once that's done, you'll be ready to go! \n\n If you have any questions, feel free to <mailto:arcade@hackclub.com | email us> or ask for help in <#C077TSWKER0>`,
+          text: `Congratulations on completing your first five hours! Before you can move on to Step 3, we do need you to complete that <https://hack.club/arcade-verify?prefill_Hack+Club+Slack+ID=${userId}&hide_Hack+Club+Slack+ID=true|age verification>. Once that's done, you'll be ready to go! \n\n If you have any questions, feel free to <mailto:arcade@hackclub.com | email us> or ask for help in <#C077TSWKER0>`,
         },
-      },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "FINAL FAKE THING THAT WONT BE HERE",
-              emoji: true,
-            },
-            value: "fake_it_final",
-          },
-        ],
       },
     ],
   });
@@ -129,7 +89,7 @@ async function sendAlreadyVerifiedDM(client, userId) {
 
 1. *Join Hack Club ✓*
 2. *Hack on Projects ✓*
-*Get Cool Stuff* ← _You are here_
+3. *Get Cool Stuff* ← _You are here_
 
 You can keep banking hours, or <https://www.google.com|claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.`,
         },
@@ -141,7 +101,7 @@ You can keep banking hours, or <https://www.google.com|claim your first arcade p
             type: "button",
             text: {
               type: "plain_text",
-              text: "FINAL FAKE THING THAT WONT BE HERE",
+              text: "Fake first order",
               emoji: true,
             },
             value: "fake_it_final",
@@ -152,7 +112,7 @@ You can keep banking hours, or <https://www.google.com|claim your first arcade p
   });
 }
 
-export async function sendStep3DM(client, userId) {
+export async function sendFirstPurchaseSubmittedDM(client, userId) {
   await client.chat.postMessage({
     channel: userId,
     blocks: [
@@ -166,7 +126,7 @@ export async function sendStep3DM(client, userId) {
 2. *Hack on Projects ✓*
 3. *Get Cool Stuff ✓*
 
-This is just the beginning. You have all summer to keep logging hours and claiming prizes. The Arcade closes on August 31st. Godspeed hacker, we can't wait to see what you build :heart:`,
+This is just the beginning. You have all summer to keep logging hours and claiming prizes! The Arcade closes on August 31st. Godspeed hacker, we can't wait to see what you build :heart:`,
         },
       },
     ],

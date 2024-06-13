@@ -12,7 +12,8 @@ export async function slackInvite(req, res) {
     ) {
       return res.status(403).json({ error: "Invalid credentials sent!" });
     } else {
-      const email = req?.body?.email;
+      const email = req!.body!.email;
+
       const result = { email };
       if (email) {
         const { ok, error } = await inviteUser(req.body);

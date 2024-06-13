@@ -13,11 +13,11 @@ export async function verification(req: Request, res: Response) {
   // destructure the headers to get the authorization token
   let { authorization } = headers;
 
-  if (authorization !== `Bearer ${process.env.EightBitSecret}`) {
+  if (authorization !== `Bearer ${process.env.TrashPandaSecret}`) {
     res.status(401).send({ message: "Unauthorized" });
     return;
   } else {
-    if (!body.email) {
+    if (email) {
       res.status(400).send({ message: "Email is required" });
       return;
     } else {
