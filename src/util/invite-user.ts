@@ -18,9 +18,10 @@ async function inviteGuestToSlack({ email, channels }) {
 
   return await axios({
     method: "POST",
-    url: `https://slack.com/api/users.admin.invite`,
+    url: `https://slack.com/api/users.admin.inviteBulk`,
     headers: {
       Cookie: cookieValue,
+      "User-Agent": "jasper@hackclub.com",
       "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.SLACK_BROWSER_TOKEN}`,
     },
@@ -36,12 +37,16 @@ async function inviteGuestToSlack({ email, channels }) {
 
 let channels = [
   "C01504DCLVD", // #scrapbook
-  "C06U5U9ADGD", // #power-hour-bts
+  "C077TSWKER0", // #arcade-help
   "C06SBHMQU8G", // #hack-hour
 ];
 
-async function inviteUser({ email }) {
+export async function inviteUser({ email }) {
+  console.log(
+    "calling inviteGuestToSlack with email",
+    email,
+    "and channels",
+    channels
+  );
   return await inviteGuestToSlack({ email, channels });
 }
-
-module.exports = { inviteUser };

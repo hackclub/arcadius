@@ -27,6 +27,7 @@ export async function upgradeUser(user) {
     headers: {
       Cookie: cookieValue,
       "Content-Type": "application/json",
+      "User-Agent": "jasper@hackclub.com",
       Authorization: `Bearer ${process.env.SLACK_BROWSER_TOKEN}`,
     },
     data: form,

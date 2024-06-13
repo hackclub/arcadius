@@ -2,18 +2,28 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { App, ExpressReceiver } from "@slack/bolt";
-import axios from "axios";
 import colors from "colors";
+import { CronJob } from "cron";
 import express from "express";
 
 import { health } from "./endpoints/health";
 import { index } from "./endpoints/index";
 import { slackInvite } from "./endpoints/slack-invite";
+import { tmp } from "./endpoints/tmp";
 import { verification } from "./endpoints/verification";
+import {
+  getHoursUsers,
+  getVerifiedUsers,
+  hoursAirtable,
+} from "./functions/airtable";
+import { fetchUsers } from "./functions/jankySlackCrap";
+import {
+  sendAlreadyVerifiedDM,
+  sendInitalDM,
+  sendStep3DM,
+  sendVerificationDM,
+} from "./functions/sendStuff";
 import { arcadeStartInteraction } from "./interactions/arcade-start";
-import { joinCaveInteraction } from "./interactions/join-cave";
-// import { setupCaveChannel } from "./setup";
-import { sleep } from "./util/sleep";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -26,51 +36,10 @@ const app = new App({
   receiver,
 });
 
-async function postImage() {
-  // const file = await axios({
-  //   method: "get",
-  //   url: "https://cloud-45c5n1f77-hack-club.vercel.app/0ezgif.com-gif-maker.gif", //TODO: Change this to something arcade!
-  //   responseType: "stream",
-  // });
-  // const response = await client.files.upload({
-  //   channel: "C077MH3QRFU",
-  //   file: file.data,
-  //   filename: "you enter the arcade.gif",
-  // });
-  // const response = await client.files.uploadV2({
-  //   channel: "C077MH3QRFU",
-  //   file: "https://cloud-45c5n1f77-hack-club.vercel.app/0ezgif.com-gif-maker.gif",
-  //   filename: "you enter the arcade.gif",
-  // });
-  // const response = await client.files.
-}
-
-async function postAudio() {
-  const file = await axios({
-    method: "get",
-    url: "https://cloud-dhlcphml7-hack-club-bot.vercel.app/0bounce.mp3",
-    responseType: "stream",
-  });
-  console.log({
-    channel: "C077MH3QRFU",
-  });
-  const response = await client.files.uploadV2({
-    channel: "C077MH3QRFU",
-    file: file.data,
-    filename: "play me.m4a",
-    // filetype: "m4a",
-  });
-}
-
-// create a wildcard listerer for all events
 app.event(/.*/, async ({ event, client }) => {
-  console.log(event);
-
   switch (event.type) {
-    case "member_joined_channel":
-      if (event.channel === "C06T7A8E3") {
-        await joinCaveInteraction({ client, payload: { user: event.user } });
-      }
+    case "team_join":
+      await sendInitalDM(client, event.user.id);
       break;
   }
 });
@@ -83,14 +52,30 @@ app.action(/.*?/, async (args) => {
 
   // @ts-ignore
   switch (payload.value) {
-    case "cave_start":
-      await joinCaveInteraction({ ...args, payload: { user } });
-
-      break;
-
     case "start_playing":
       await arcadeStartInteraction({ ...args, payload: { user } });
+      break;
 
+    case "fake_it_forward_unverified":
+      await sendVerificationDM(client, user);
+      break;
+
+    case "fake_it_forward_verified":
+      await sendAlreadyVerifiedDM(client, user);
+      break;
+
+    case "fake_it_final":
+      await sendStep3DM(client, user);
+      break;
+  }
+});
+
+app.command(/.*?/, async ({ ack, body, client }) => {
+  await ack();
+
+  switch (body.command) {
+    case "/dm-me":
+      sendInitalDM(client, body.user_id);
       break;
   }
 });
@@ -101,6 +86,7 @@ receiver.router.get("/ping", health);
 receiver.router.get("/up", health);
 receiver.router.post("/verify", verification);
 receiver.router.post("/slack-invite", slackInvite);
+receiver.router.post("/tmp", tmp);
 
 const logStartup = async (app: App) => {
   // await app.client.chat.postMessage({
@@ -120,9 +106,108 @@ const logStartup = async (app: App) => {
           )
         );
       })
-      .then(() => {
-        // setupCaveChannel();
-        sleep(100);
+      .then(async () => {
+        new CronJob(
+          "*/3 * * * * *",
+          async function () {
+            console.log(
+              colors.yellow(
+                "Running cron job to check full users against arcade users."
+              )
+            );
+            let pUsers = await getHoursUsers();
+
+            pUsers.forEach(async (user) => {
+              // run fetchUsers for the user
+              let tU = await fetchUsers(user["Email"]);
+
+              if (tU == user["Email"]) {
+                // mark the user as a fullUser in airtable
+                try {
+                  // find the airtable record for the user
+                  const userRec = await hoursAirtable
+                    .select({
+                      filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
+                      pageSize: 1,
+                    })
+                    .firstPage();
+                  // update the record
+                  await hoursAirtable.update(userRec[0].id, {
+                    isFullUser: true,
+                  });
+                } catch (err) {
+                  console.error(colors.red(`Error updating user: ${err}`));
+                }
+              }
+            });
+          }, // onTick
+          null, // onComplete
+          true, // start
+          "America/New_York" // timeZone
+        );
+
+        new CronJob(
+          "*/5 * * * * *",
+          async function () {
+            console.log(
+              colors.blue(
+                "Running cron job to check for users with more than 5 hours."
+              )
+            );
+            let USERS = await getHoursUsers();
+            let usersWithMoreThan5Hours = USERS.filter((user) => {
+              let minutesApproved = Number(user["Minutes (Approved)"] ?? 0);
+              return minutesApproved / 60 >= 5;
+            });
+
+            // check if the user has advancedToStepTwo === true
+            // if not, send them a DM
+            if (usersWithMoreThan5Hours.length > 0) {
+              usersWithMoreThan5Hours.forEach(async (user) => {
+                // TODO ~ Handle Cases where user is already a full user. This should silently error (skip) as it will be caught by ops during the order stage, but we need to handle this to prevent this bot dm'ing the user at any stage
+
+                if (user["advancedToStepTwo"] === true) {
+                  return;
+                } else {
+                  try {
+                    let tmp = await getVerifiedUsers();
+
+                    // make an array of 'Hack Club Slack ID's
+                    let verifiedUsers = tmp.map(
+                      (user) => user["Hack Club Slack ID"]
+                    );
+
+                    if (verifiedUsers.includes(user["Slack ID"])) {
+                      await sendAlreadyVerifiedDM(app.client, user["Slack ID"]);
+                    } else {
+                      await sendVerificationDM(app.client, user["Slack ID"]);
+                    }
+                    try {
+                      // find the airtable record for the user
+                      const userRec = await hoursAirtable
+                        .select({
+                          filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
+                          pageSize: 1,
+                        })
+                        .firstPage();
+                      // update the record
+                      await hoursAirtable.update(userRec[0].id, {
+                        advancedToStepTwo: true,
+                      });
+                    } catch (err) {
+                      console.error(colors.red(`Error updating user: ${err}`));
+                    }
+                  } catch (err) {
+                    console.error(colors.red(`Error: ${err}`));
+                  }
+                }
+              });
+            }
+          }, // onTick
+          null, // onComplete
+          true, // start
+          "America/New_York" // timeZone
+        );
       })
       .catch((err) => {
         console.error(colors.red(`Error starting app: ${err}`));
