@@ -5,6 +5,7 @@ import { App, ExpressReceiver } from "@slack/bolt";
 import colors from "colors";
 import { CronJob } from "cron";
 import express from "express";
+import responseTime from "response-time";
 
 import metrics from "./metrics";
 import { health } from "./endpoints/health";
@@ -83,6 +84,21 @@ receiver.router.get("/up", health);
 receiver.router.post("/verify", verification);
 receiver.router.post("/slack-invite", slackInvite);
 receiver.router.post("/tmp", tmp);
+
+receiver.router.use(
+    responseTime((req, res, time) => {
+        const stat = (req.method + "/" + req.url?.split("/")[1])
+            .toLowerCase()
+            .replace(/[:.]/g, "")
+            .replace(/\//g, "_");
+            
+        const httpCode = res.statusCode;
+        const timingStatKey = `http.response.${stat}`;
+        const codeStatKey = `http.response.${stat}.${httpCode}`;
+        metrics.timing(timingStatKey, time);
+        metrics.increment(codeStatKey, 1);
+    })
+);
 
 const logStartup = async (app: App) => {
   // await app.client.chat.postMessage({
