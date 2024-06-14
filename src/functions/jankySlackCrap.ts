@@ -32,6 +32,6 @@ export const fetchUsers = async (email) => {
 
   const response = await a.json();
 
-  metrics.timing("http.requests.api_users-admin-fetchTeamUsers", performance.now() - startTs);
+  metrics.timing("http.requests.api_users-admin-fetchTeamUsers.200", performance.now() - startTs);
   return response.items?.[0]?.email;
 };
