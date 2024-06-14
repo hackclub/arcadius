@@ -1,10 +1,10 @@
-import metrics from "../metrics";
 import colors from "colors";
+import metrics from "../metrics";
 import logger from "./Logger";
 
 async function inviteGuestToSlack({ email, channels }) {
-  metrics.increment("http.request.api_users-admin-inviteGuestToSlack")
-  const startTs = performance.now()
+  metrics.increment("http.request.api_users-admin-inviteGuestToSlack");
+  const startTs = performance.now();
 
   const xoxc = process.env.ARCADIUS_SLACK_BROWSER_TOKEN!;
   const xoxd = process.env.ARCADIUS_SLACK_COOKIE!;
@@ -42,9 +42,15 @@ async function inviteGuestToSlack({ email, channels }) {
     result = false;
   } finally {
     if (result) {
-      metrics.timing("http.requests.api_users-admin-inviteGuestToSlack.200", performance.now() - startTs);
+      metrics.timing(
+        "http.requests.api_users-admin-inviteGuestToSlack.200",
+        performance.now() - startTs
+      );
     } else {
-      metrics.timing("http.requests.api_users-admin-inviteGuestToSlack.400", performance.now() - startTs);
+      metrics.timing(
+        "http.requests.api_users-admin-inviteGuestToSlack.400",
+        performance.now() - startTs
+      );
     }
     return result;
   }
@@ -61,11 +67,10 @@ let csvChannels = channels.join(",");
 
 export async function inviteUser({ email }) {
   console.log(colors.red.dim(`Inviting ${email} to Slack...`));
-  return await inviteGuestToSlack({ email, channels });
-  // .then(() => {
-  //   console.log(colors.green.dim(`Invited ${email} to Slack!`));
-  //   return { ok: true };
-  // });
+  return await inviteGuestToSlack({ email, channels }).then(() => {
+    console.log(colors.green.dim(`Invited ${email} to Slack!`));
+    return { ok: true };
+  });
 }
 
 /////////

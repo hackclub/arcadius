@@ -353,6 +353,7 @@ new CronJob(
   "America/New_York"
 );
 
+// FIXME: This needs to be slow enough to not hit before the slack invite is sent reguarly
 new CronJob(
   "*/5 * * * * *",
   async function () {
