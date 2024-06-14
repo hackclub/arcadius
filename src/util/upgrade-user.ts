@@ -3,7 +3,7 @@ dotenv.config();
 
 import { App } from "@slack/bolt";
 
-import logger from "./Logger";
+import logger, { slog } from "./Logger";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN!,
@@ -16,6 +16,8 @@ export async function upgradeUser(client, slackId) {
   const xoxc = process.env.ARCADIUS_SLACK_BROWSER_TOKEN;
   const user = slackId;
   const xoxd = process.env.ARCADIUS_SLACK_COOKIE;
+
+  slog(`Upgrading user ${user}`);
 
   try {
     await fetch("https://hackclub.slack.com/api/users.admin.setRegular", {
@@ -30,5 +32,6 @@ export async function upgradeUser(client, slackId) {
     }).then((r) => r.json());
   } catch (e) {
     logger(`Error upgrading user ${e}`, "error");
+    slog(`Error upgrading user ${e}`);
   }
 }

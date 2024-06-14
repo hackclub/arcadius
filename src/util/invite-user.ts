@@ -1,10 +1,12 @@
 import colors from "colors";
 import metrics from "../metrics";
-import logger from "./Logger";
+import logger, { slog } from "./Logger";
 
 async function inviteGuestToSlack({ email, channels }) {
   metrics.increment("http.request.api_users-admin-inviteGuestToSlack");
   const startTs = performance.now();
+
+  slog(`Inviting ${email} to Slack...`);
 
   const xoxc = process.env.ARCADIUS_SLACK_BROWSER_TOKEN!;
   const xoxd = process.env.ARCADIUS_SLACK_COOKIE!;
@@ -69,8 +71,7 @@ export async function inviteUser({ email }) {
   console.log(colors.red.dim(`Inviting ${email} to Slack...`));
   return await inviteGuestToSlack({ email, channels }).then(() => {
     console.log(colors.green.dim(`Invited ${email} to Slack!`));
+    slog(`Invited ${email} to Slack!`);
     return { ok: true };
   });
 }
-
-/////////

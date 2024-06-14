@@ -1,45 +1,8 @@
 import axios from "axios";
 import metrics from "../metrics";
+import { updateUserChannel } from "./airtable";
 
 const haccoonId = "U078FB76K5F";
-
-async function postImage(client) {
-  // const file = await axios({
-  //   method: "get",
-  //   url: "https://cloud-45c5n1f77-hack-club.vercel.app/0ezgif.com-gif-maker.gif", //TODO: Change this to something arcade!
-  //   responseType: "stream",
-  // });
-  // const response = await client.files.upload({
-  //   channel: "C077MH3QRFU",
-  //   file: file.data,
-  //   filename: "you enter the arcade.gif",
-  // });
-  // const response = await client.files.uploadV2({
-  //   channel: "C077MH3QRFU",
-  //   file: "https://cloud-45c5n1f77-hack-club.vercel.app/0ezgif.com-gif-maker.gif",
-  //   filename: "you enter the arcade.gif",
-  // });
-  // const response = await client.files.
-}
-
-async function postAudio(client) {
-  const file = await axios({
-    method: "get",
-    url: "https://cloud-dhlcphml7-hack-club-bot.vercel.app/0bounce.mp3",
-    responseType: "stream",
-    headers: {
-      "User-Agent": "jasper@hackclub.com",
-    },
-  });
-
-  metrics.increment("http.request.api_files-uploadv2");
-  const response = await client.files.uploadV2({
-    channel: "C077MH3QRFU",
-    file: file.data,
-    filename: "play me.m4a",
-    // filetype: "m4a",
-  });
-}
 
 async function sendInitalDM(client, userId) {
   metrics.increment("http.request.api_chat-postmessage");
@@ -49,6 +12,8 @@ async function sendInitalDM(client, userId) {
     })
     .then((res) => res.channel.id);
 
+  await updateUserChannel(userId, channel);
+
   await client.chat.postMessage({
     channel,
     blocks: [
@@ -56,19 +21,66 @@ async function sendInitalDM(client, userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `Welcome hacker, it's so good to see you!! You know what this means, right? You've made it to Step 2 of the Hack Club Arcade :summer::joystick:
+          text: `Welcome hacker, it's so good to see you! You know what this means, right? You've made it to Step 2 of the Hack Club Arcade!! :summer::joystick:
 
 1. *Join the Slack ✓*
 2. *Hack on Projects* ← _You are here_
 3. Get Cool Stuff
 
-Hack Club is a rather _big_ place, the Arcade is just one little piece of it. I would love to show you around, but I'm afraid these old dinosaur bones don't move like they used to…
+Hack Club is a rather _big_ place, this Arcade is just one little piece of it. I would show you around, but these old dinosaur bones don't move like they used to…
 
-My dear friend <@U078FB76K5F> can give you a tour though! *Type \`/hack\` to summon her*`,
+My dear friend <@U078FB76K5F> can give you a tour though!`,
         },
+      },
+      {
+        type: "actions",
+        elements: [
+          {
+            type: "button",
+            text: {
+              type: "plain_text",
+              text: "Continue…",
+              emoji: true,
+            },
+            action_id: "summon_haccoon_initial",
+            value: channel,
+          },
+        ],
       },
     ],
   });
+}
+
+async function postRacoonInitalInstructions(payload) {
+  metrics.increment("http.request.api_chat-postmessage");
+
+  // console.log(payload);
+
+  // console.log(conversation);
+
+  // send a axios request to POST https://slack.com/api/chat.postMessage
+
+  let resp = await axios.post(
+    "https://slack.com/api/chat.postMessage",
+    {
+      channel: payload.value,
+      text: `_scurry scurry…_ oh hey wow, new frennd!! hey check out this neat piece of garbage i found, smells rul tasty right right??
+
+_…twitch…_
+
+anyway, Arcade?? try it try it!!
+*type \`/hack\` and send it!!*`,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.HACKOON_BOT_TOKEN}`,
+      },
+    }
+  );
+
+  // edit the old message that included the button, to remove the button
+
+  // console.log(resp);
 }
 
 async function sendVerificationDM(client, userId) {
@@ -119,7 +131,7 @@ You can keep banking hours, or <https:/hack.club/arcade-shop?slack_id=${userId}?
               text: "Fake first order",
               emoji: true,
             },
-            value: "fake_it_final",
+            action: "fake_it_final",
           },
         ],
       },
@@ -150,8 +162,7 @@ This is just the beginning. You have all summer to keep logging hours and claimi
 }
 
 export {
-  postAudio,
-  postImage,
+  postRacoonInitalInstructions,
   sendAlreadyVerifiedDM,
   sendInitalDM,
   sendVerificationDM,

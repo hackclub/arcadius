@@ -16,7 +16,7 @@ export async function slackInvite(req, res) {
 
       const result = { email };
       if (email) {
-        const { ok, error } = await inviteUser(req.body);
+        const { ok, error } = await inviteUser(client, req.body);
         result.ok = ok;
         result.error = error;
       }

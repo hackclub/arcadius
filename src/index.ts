@@ -4,15 +4,16 @@ dotenv.config();
 import { App, ExpressReceiver } from "@slack/bolt";
 import axios from "axios";
 import colors from "colors";
-import { CronJob } from "cron";
 import express from "express";
 import responseTime from "response-time";
 
+import { CronJob } from "cron";
 import { health } from "./endpoints/health";
 import { index } from "./endpoints/index";
 import { slackInvite } from "./endpoints/slack-invite";
 import { tmp } from "./endpoints/tmp";
 import {
+  createArcadeUser,
   getFirstPurchaseUsers,
   getHoursUsers,
   getInvitationFaults,
@@ -24,12 +25,12 @@ import {
 } from "./functions/airtable";
 import { fetchUsers } from "./functions/jankySlackCrap";
 import {
+  postRacoonInitalInstructions,
   sendAlreadyVerifiedDM,
   sendFirstPurchaseSubmittedDM,
   sendInitalDM,
   sendVerificationDM,
 } from "./functions/sendStuff";
-import { arcadeStartInteraction } from "./interactions/arcade-start";
 import metrics from "./metrics";
 import logger from "./util/Logger";
 import { inviteUser } from "./util/invite-user";
@@ -50,7 +51,13 @@ app.event(/.*/, async ({ event, client }) => {
   metrics.increment(`slack.event.${event.type}`);
   switch (event.type) {
     case "team_join":
-      await sendInitalDM(client, event.user.id);
+      const userInfo = await client.users.info({ user: event.user.id });
+      console.log(userInfo);
+      const email = userInfo.email;
+      const name = userInfo.real_name;
+      await createArcadeUser(event.user.id, email, name, false);
+      const channel = await sendInitalDM(client, event.user.id);
+
       break;
   }
 });
@@ -65,13 +72,13 @@ app.action(/.*?/, async (args) => {
   metrics.increment(`slack.action.${payload.value}`);
 
   // @ts-ignore
-  switch (payload.value) {
-    case "start_playing":
-      await arcadeStartInteraction({ ...args, payload: { user } });
-      break;
-
+  switch (payload.action_id) {
     case "fake_it_final":
       await sendFirstPurchaseSubmittedDM(client, user);
+      break;
+
+    case "summon_haccoon_initial":
+      await postRacoonInitalInstructions(payload);
       break;
   }
 });
@@ -89,6 +96,23 @@ receiver.router.get("/ping", health);
 receiver.router.get("/up", health);
 receiver.router.post("/slack-invite", slackInvite);
 receiver.router.post("/tmp", tmp);
+receiver.router.post("/begin", async (req, res) => {
+  const userId = req.body.userId;
+  const user = (await client.users.info({ user: userId })).user;
+  try {
+    const arcadeUser = await createArcadeUser(
+      userId,
+      user.profile.email,
+      user.profile.real_name,
+      true
+    );
+    const channel = await sendInitalDM(client, req.body.userId);
+    res.json({ channel, arcadeUserId: arcadeUser.id });
+  } catch (err) {
+    console.error(err);
+    res.json({});
+  }
+});
 receiver.router.post("/demo", (req) => {
   demo(req.body.userId);
   // upgradeUser(client, "U077HDMHF8E");
@@ -146,6 +170,25 @@ const logStartup = async (app: App) => {
     text: `I AM ALIVE! :heart-eng: :robot_face: \n\n What'da know? I'm running in the env *${process.env.NODE_ENV}*! :tada:`,
   });
 };
+
+// async function begin(userId: string) {
+//   console.log(`Beginning ${userId}`);
+//   try {
+//     const userRecord = (
+//       await hoursAirtable
+//         .select({ filterByFormula: `{Slack ID} = '${userId}'` })
+//         .all()
+//     ).at(0);
+
+//     if (userRecord) {
+//       sendInitalDM(client, userId);
+//     } else {
+//       logger(`No existing arcade record for slack ID ${userId}`, "error");
+//     }
+//   } catch (err) {
+//     logger(`Error running demo for ${userId}: ${err}`, "error");
+//   }
+// }
 
 async function demo(userId: string) {
   console.log(`Demoing ${userId}`);
@@ -334,7 +377,7 @@ new CronJob(
 new CronJob(
   "*/3 * * * * *",
   async function () {
-    logger("Checking full users against arcade users.", "cron");
+    // logger("Checking full users against arcade users.", "cron");
     // await jobCheckUsers();
   },
   null,
@@ -357,7 +400,7 @@ new CronJob(
 new CronJob(
   "*/5 * * * * *",
   async function () {
-    logger("Checking for slack invitation faults.", "cron");
+    // logger("Checking for slack invitation faults.", "cron");
     await pollInvitationFaults();
   },
   null,
@@ -369,7 +412,7 @@ new CronJob(
   "*/5 * * * * *",
   async function () {
     // logger("Polling for first purchase users.", "cron");
-    // await pollFirstPurchaseUsers();
+    await pollFirstPurchaseUsers();
   }, // onTick
   null, // onComplete
   true, // start

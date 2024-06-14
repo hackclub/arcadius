@@ -1,9 +1,10 @@
 import * as dotenv from "dotenv";
+import { client } from "../index";
 dotenv.config();
 
 import colors from "colors";
 
-export async function postSlackLog(client, logMessage) {
+async function slog(logMessage) {
   if (process.env.NODE_ENV === "production") {
     await client.chat.postMessage({
       channel: "C077F5AVB38",
@@ -38,7 +39,7 @@ export const clog = async (logMessage, type: LogType) => {
   }
 };
 
-export default clog;
+export { clog as default, slog };
 
 // # LOG_CHANNEL= "C077F5AVB38", # Prod Logging
 // LOG_CHANNEL= "C069N64PW4A", # secret testing of secret things

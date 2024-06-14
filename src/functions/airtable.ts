@@ -151,6 +151,44 @@ export async function getMinimumHoursConfirmedUsers() {
   return data;
 }
 
+export async function updateUserChannel(slackId, channelId) {
+  try {
+    const user = (
+      await hoursAirtable
+        .select({ filterByFormula: `{Slack ID} = '${slackId}'` })
+        .all()
+    ).at(0);
+    if (user) {
+      hoursAirtable.update(user.id, {
+        dmChannel: channelId,
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+export async function createArcadeUser(slackId, email, name, preexisting) {
+  console.log("Creating arcade user", slackId, email, name, preexisting);
+  const userRecord = (
+    await hoursAirtable
+      .select({ filterByFormula: `{Slack ID} = '${slackId}'` })
+      .all()
+  ).at(0);
+
+  if (!userRecord) {
+    return await hoursAirtable.create({
+      "Slack ID": slackId,
+      Email: email,
+      Name: name,
+      Preexisting: preexisting,
+    });
+  } else {
+    console.log("User already exists!");
+    return userRecord;
+  }
+}
+
 export {
   hoursAirtable,
   ordersAirtable,
