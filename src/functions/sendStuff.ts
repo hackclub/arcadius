@@ -1,4 +1,5 @@
 import axios from "axios";
+import metrics from "../metrics"
 
 async function postImage(client) {
   // const file = await axios({
@@ -27,7 +28,9 @@ async function postAudio(client) {
     headers: {
       "User-Agent": "jasper@hackclub.com",
     },
-  });
+    });
+    
+  metrics.increment("http.request.api_files-uploadv2");
   const response = await client.files.uploadV2({
     channel: "C077MH3QRFU",
     file: file.data,
@@ -37,6 +40,7 @@ async function postAudio(client) {
 }
 
 async function sendInitalDM(client, userId) {
+  metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
     channel: userId,
     blocks: [
@@ -63,6 +67,7 @@ One more thing… please make sure to complete the <https://hack.club/arcade-ver
 }
 
 async function sendVerificationDM(client, userId) {
+  metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
     channel: userId,
     blocks: [
@@ -78,6 +83,7 @@ async function sendVerificationDM(client, userId) {
 }
 
 async function sendAlreadyVerifiedDM(client, userId) {
+  metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
     channel: userId,
     blocks: [
@@ -113,6 +119,7 @@ You can keep banking hours, or <https://www.google.com|claim your first arcade p
 }
 
 export async function sendFirstPurchaseSubmittedDM(client, userId) {
+  metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
     channel: userId,
     blocks: [

@@ -1,5 +1,6 @@
 import Airtable from "airtable";
 import { FlowSignals } from "../lib/enums";
+import metrics from "../metrics";
 
 const signalBase = new Airtable({
   apiKey: process.env.AIRTABLE_API_KEY,
@@ -10,6 +11,9 @@ async function updateSignal(
   signalValue: boolean,
   slackId: string
 ) {
+  metrics.increment("airtable.update_signal")
+  const startTs = performance.now();
+
   const record = await signalBase
     .select({
       filterByFormula: `{Slack ID} = "${slackId}"`,
@@ -25,6 +29,8 @@ async function updateSignal(
   } else {
     console.error("No records found for user");
   }
+
+  metrics.timing("airtable.update_signal", performance.now() - startTs);
 }
 
 export { signalBase, updateSignal };
