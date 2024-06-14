@@ -1,10 +1,15 @@
+import metrics from "../metrics";
 import colors from "colors";
 import logger from "./Logger";
 
 async function inviteGuestToSlack({ email, channels }) {
+  metrics.increment("http.request.api_users-admin-inviteGuestToSlack")
+  const startTs = performance.now()
+
   const xoxc = process.env.ARCADIUS_SLACK_BROWSER_TOKEN!;
   const xoxd = process.env.ARCADIUS_SLACK_COOKIE!;
 
+  let result;
   try {
     const res = await fetch(
       "https://hackclub.slack.com/api/users.admin.inviteBulk?_x_id=b0f5404e-1718353823.874&_x_csid=IEsVHGOxDp4&slack_route=T0266FRGM&_x_version_ts=1718329055&_x_frontend_build_type=current&_x_desktop_ia=4&_x_gantry=true&fp=51&_x_num_retries=0",
@@ -31,10 +36,17 @@ async function inviteGuestToSlack({ email, channels }) {
     );
     const data = await res.json();
     console.log(data);
-    return data.ok;
+    result = data.ok;
   } catch (e) {
     logger(`Error inviting user ${email} to Slack: ${e}`, "error");
-    return false;
+    result = false;
+  } finally {
+    if (result) {
+      metrics.timing("http.requests.api_users-admin-inviteGuestToSlack.200", performance.now() - startTs);
+    } else {
+      metrics.timing("http.requests.api_users-admin-inviteGuestToSlack.400", performance.now() - startTs);
+    }
+    return result;
   }
 }
 
