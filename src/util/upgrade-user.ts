@@ -2,7 +2,8 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { App } from "@slack/bolt";
-import colors from "colors";
+
+import logger from "./Logger";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN!,
@@ -19,6 +20,7 @@ export async function upgradeUser(client, slackId) {
   try {
     await fetch("https://hackclub.slack.com/api/users.admin.setRegular", {
       headers: {
+        "User-Agent": "jasper@hackclub.com",
         "content-type":
           "multipart/form-data; boundary=----WebKitFormBoundarykMFpMcwa07hfrBLw",
         cookie: `d=${xoxd}`,
@@ -27,6 +29,6 @@ export async function upgradeUser(client, slackId) {
       method: "POST",
     }).then((r) => r.json());
   } catch (e) {
-    console.error(colors.bgRed.bold(`Error upgrading user: ${e}`));
+    logger(`Error upgrading user ${e}`, "error");
   }
 }

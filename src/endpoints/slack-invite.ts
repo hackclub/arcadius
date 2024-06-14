@@ -23,7 +23,7 @@ export async function slackInvite(req, res) {
       res.json(result);
     }
   } catch (e) {
-    console.error(colors.bgRed.bold(`[ERROR]: ${e}`));
+    logger(`Error in slackInvite: ${e}`, "error");
     res.status(500).json({ ok: false, error: "a fatal error occurred" });
   }
 }

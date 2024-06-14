@@ -75,6 +75,8 @@ async function sendVerificationDM(client, userId) {
   metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
     channel: userId,
+    unfurl_links: false,
+    unfurl_media: false,
     blocks: [
       {
         type: "section",
@@ -87,10 +89,12 @@ async function sendVerificationDM(client, userId) {
   });
 }
 
-async function sendAlreadyVerifiedDM(client, userId) {
+async function sendAlreadyVerifiedDM(client, userId, internalID) {
   metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
     channel: userId,
+    unfurl_links: false,
+    unfurl_media: false,
     blocks: [
       {
         type: "section",
@@ -102,7 +106,7 @@ async function sendAlreadyVerifiedDM(client, userId) {
 2. *Hack on Projects ✓*
 3. *Get Cool Stuff* ← _You are here_
 
-You can keep banking hours, or <https://www.google.com|claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.`,
+You can keep banking hours, or <https:/hack.club/arcade-shop?slack_id=${userId}?internal_id=${internalID}|claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.`,
         },
       },
       {

@@ -19,7 +19,7 @@ const verificationsAirtable = new Airtable({
 
 const slackJoinsAirtable = new Airtable({
   apiKey: process.env.AIRTABLE_KEY,
-}).base("appaqcJtn33vb59Au")("Join Requests");
+}).base("appaqcJtn33vb59Au")("Arcade Joins");
 
 // TODO !~ This needs doing!
 // const purchasesAirtable = new Airtable({})
@@ -50,7 +50,7 @@ export async function getHoursUsers() {
 
   let users = await hoursAirtable
     .select({
-      // fields: ["Name", "Hack Hour ID", "Slack ID", "Email", "Minutes "]
+      // fields: ["Name", "Internal ID", "Slack ID", "Email", "Minutes "]
     })
     .all();
 
@@ -69,7 +69,7 @@ export async function getVerificationsUsers() {
 
   let users = await verificationsAirtable
     .select({
-      // fields: ["Name", "Hack Hour ID", "Slack ID", "Email", "Minutes "]
+      // fields: ["Name", "Internal ID", "Slack ID", "Email", "Minutes "]
     })
     .all();
 
@@ -106,7 +106,7 @@ export async function getInvitationFaults() {
 
   const data = await slackJoinsAirtable
     .select({
-      // filterByFormula: `AND(NOT({Invited}), NOT({Denied}), IS_AFTER({Created At}, DATETIME_PARSE('2024-07-12')))`,
+      filterByFormula: `NOT({Invited})`,
     })
     .all();
 

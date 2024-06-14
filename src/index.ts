@@ -20,6 +20,7 @@ import {
   hoursAirtable,
   ordersAirtable,
   sessionsAirtable,
+  slackJoinsAirtable,
 } from "./functions/airtable";
 import { fetchUsers } from "./functions/jankySlackCrap";
 import {
@@ -30,6 +31,7 @@ import {
 } from "./functions/sendStuff";
 import { arcadeStartInteraction } from "./interactions/arcade-start";
 import metrics from "./metrics";
+import logger from "./util/Logger";
 import { inviteUser } from "./util/invite-user";
 import { upgradeUser } from "./util/upgrade-user";
 
@@ -89,6 +91,7 @@ receiver.router.post("/slack-invite", slackInvite);
 receiver.router.post("/tmp", tmp);
 receiver.router.post("/demo", (req) => {
   demo(req.body.userId);
+  // upgradeUser(client, "U077HDMHF8E");
 });
 
 receiver.router.use(
@@ -136,11 +139,12 @@ axios.interceptors.response.use((res: any) => {
 });
 
 const logStartup = async (app: App) => {
-  // await app.client.chat.postMessage({
-  //   // channel: "C077F5AVB38",
-  //   channel: "C069N64PW4A",
-  //   text: `I AM ALIVE! :heart-eng: :robot_face: \n\n What'da know? I'm running in the env *${process.env.NODE_ENV}*! :tada:`,
-  // });
+  await app.client.chat.postMessage({
+    // LOG_CHANNEL= "C077F5AVB38", # Prod Logging
+    // LOG_CHANNEL= "C069N64PW4A", # secret testing of secret things
+    channel: "C069N64PW4A",
+    text: `I AM ALIVE! :heart-eng: :robot_face: \n\n What'da know? I'm running in the env *${process.env.NODE_ENV}*! :tada:`,
+  });
 };
 
 async function demo(userId: string) {
@@ -180,14 +184,10 @@ async function demo(userId: string) {
 
       sendInitalDM(client, userId);
     } else {
-      console.error(
-        colors.bgRed.bold(`No existing arcade record for slack ID ${userId}`)
-      );
+      logger(`No existing arcade record for slack ID ${userId}`, "error");
     }
   } catch (err) {
-    console.error(
-      colors.bgRed.bold(`Error running demo for ${userId}: ${err}`)
-    );
+    logger(`Error running demo for ${userId}: ${err}`, "error");
   }
 }
 
@@ -213,7 +213,7 @@ async function jobCheckUsers() {
           isFullUser: true,
         });
       } catch (err) {
-        console.error(colors.bgRed.bold(`Error updating user: ${err}`));
+        logger(`Error updating user: ${err}`, "error");
       }
     }
   });
@@ -246,11 +246,13 @@ async function checkUserHours() {
               verifiedUsers.includes(user["Slack ID"]) &&
               user["verificationDmSent"]
             ) {
-              await sendAlreadyVerifiedDM(app.client, user["Slack ID"]).then(
-                () => {
-                  upgradeUser(client, user["Slack ID"]);
-                }
-              );
+              await sendAlreadyVerifiedDM(
+                app.client,
+                user["Slack ID"],
+                user["Internal ID"]
+              ).then(() => {
+                upgradeUser(client, user["Slack ID"]);
+              });
             } else {
               await sendVerificationDM(app.client, user["Slack ID"]);
             }
@@ -267,7 +269,7 @@ async function checkUserHours() {
                 verificationDmSent: true,
               });
             } catch (err) {
-              console.error(colors.bgRed.bold(`[ERROR]: ${err}`));
+              logger(`Error updating user: ${err}`, "error");
             }
           } else {
             return;
@@ -279,16 +281,20 @@ async function checkUserHours() {
 }
 
 async function pollInvitationFaults() {
-  if (0 > 1) {
+  try {
     const uninvitedUsers = await getInvitationFaults();
 
     uninvitedUsers
-      .map((record) => record.fields)
-      .forEach((fields) => {
-        let email = fields["Email"];
+      .map((record) => record)
+      .forEach((record) => {
+        let email = record.fields["Email"];
 
-        inviteUser({ email });
+        inviteUser({ email }).then((v) => {
+          if (v) slackJoinsAirtable.update(record.id, { Invited: true });
+        });
       });
+  } catch (err) {
+    logger(`Error polling invitation faults: ${err}`, "error");
   }
 }
 
@@ -328,10 +334,8 @@ new CronJob(
 new CronJob(
   "*/3 * * * * *",
   async function () {
-    console.log(
-      colors.magenta("[CRON]: Checking full users against arcade users.")
-    );
-    await jobCheckUsers();
+    logger("Checking full users against arcade users.", "cron");
+    // await jobCheckUsers();
   },
   null,
   true,
@@ -341,10 +345,8 @@ new CronJob(
 new CronJob(
   "*/5 * * * * *",
   async function () {
-    console.log(
-      colors.magenta("[CRON]: Checking for users with more than minimum hours.")
-    );
-    await checkUserHours();
+    // logger("Checking for users with more than minimum hours.", "cron");
+    // await checkUserHours();
   },
   null,
   true,
@@ -354,9 +356,7 @@ new CronJob(
 new CronJob(
   "*/5 * * * * *",
   async function () {
-    console.log(
-      colors.magenta("[CRON]: Checking for slack invitation faults.")
-    );
+    logger("Checking for slack invitation faults.", "cron");
     await pollInvitationFaults();
   },
   null,
@@ -367,8 +367,8 @@ new CronJob(
 new CronJob(
   "*/5 * * * * *",
   async function () {
-    console.log(colors.magenta("[CRON]: Polling for first purchase users."));
-    await pollFirstPurchaseUsers();
+    // logger("Polling for first purchase users.", "cron");
+    // await pollFirstPurchaseUsers();
   }, // onTick
   null, // onComplete
   true, // start
