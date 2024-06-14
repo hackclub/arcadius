@@ -76,11 +76,7 @@ app.command(/.*?/, async ({ ack, body, client }) => {
   await ack();
   metrics.increment(`slack.command.${body.command}`);
 
-  switch (body.command) {
-    case "/dm-me":
-      sendInitalDM(client, body.user_id);
-      break;
-  }
+  // This is not used
 });
 
 receiver.router.use(express.json());
