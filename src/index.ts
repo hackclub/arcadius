@@ -4,6 +4,7 @@ dotenv.config();
 import { App, ExpressReceiver } from "@slack/bolt";
 import axios from "axios";
 import colors from "colors";
+import { CronJob } from "cron";
 import express from "express";
 import responseTime from "response-time";
 
@@ -273,6 +274,7 @@ app.start(process.env.PORT || 3000).then(async () => {
   await logStartup(app);
   console.log("⚡️ Bolt app is running in env", process.env.NODE_ENV);
 
+  // Heartbeat
   new CronJob(
     "0 * * * * *",
     async function () {
@@ -282,10 +284,54 @@ app.start(process.env.PORT || 3000).then(async () => {
     true,
     "America/New_York"
   );
-  jobCheckUsers();
-  checkUserHours();
-  pollInvitationFaults();
-  pollFirstPurchaseUsers();
+
+  new CronJob(
+    "*/3 * * * * *",
+    async function () {
+      await jobCheckUsers();
+    },
+    null,
+    true,
+    "America/New_York"
+  );
+
+  new CronJob(
+    "*/5 * * * * *",
+    async function () {
+      await checkUserHours();
+    },
+    null,
+    true,
+    "America/New_York"
+  );
+
+  new CronJob(
+    "*/5 * * * * *",
+    async function () {
+      await pollInvitationFaults();
+    },
+    null,
+    true,
+    "America/New_York"
+  );
+
+  new CronJob(
+    "*/5 * * * * *",
+    async function () {
+      await pollFirstPurchaseUsers();
+    }, // onTick
+    null, // onComplete
+    true, // start
+    "America/New_York" // timeZone
+  );
+
+  // new CronJob(
+  //   "0 * * * * *",
+  //   function()
+  //   null,
+  //   true,
+  //   "America/New_York"
+  // );
 });
 
 const client: any = app.client;
