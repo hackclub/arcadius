@@ -74,7 +74,10 @@ export async function getVerificationsUsers() {
 }
 
 export async function getVerifiedUsers() {
-  return await getVerificationsUsers().then((users) => {
+  metrics.increment("airtable.get_verifiedusers");
+  const tsStart = performance.now();
+
+  const data = await getVerificationsUsers().then((users) => {
     let verifiedUsers = users.filter(
       (user) =>
         user["Verification Status"] === "Eligible L1" ||
@@ -82,6 +85,9 @@ export async function getVerifiedUsers() {
     );
     return verifiedUsers;
   });
+
+  metrics.timing("airtable.get_verifiedusers", performance.now() - tsStart);
+  return data;
 }
 
 // Check for any users that need to be invited but have not been due to an apparent fault in the system.
@@ -111,17 +117,29 @@ export async function getFirstPurchaseUsers() {
       // filterByFormula: `AND(LEN({Orders}) = 1, NOT({firstPurchaseSubmitted}))`,
     })
     .all();
+
+  metrics.timing(
+    "airtable.get_firstpurchaseusers",
+    performance.now() - tsStart
+  );
+  return data;
 }
 
 // Get all users where {Minutes (Approved)} is greater than 180
 export async function getMinimumHoursConfirmedUsers() {
-  return await hoursAirtable
+  metrics.increment("airtable.get_minimumhoursconfirmedusers");
+  const tsStart = performance.now();
+
+  const data = await hoursAirtable
     .select({
       // filterByFormula: `AND({Minutes (Approved)} > 180, NOT({minimumHoursConfirmed}))`,
     })
     .all();
 
-  metrics.timing("airtable.get_firstpurchaseusers", performance.now() - tsStart);
+  metrics.timing(
+    "airtable.get_minimumhoursconfirmedusers",
+    performance.now() - tsStart
+  );
   return data;
 }
 
