@@ -112,7 +112,7 @@ export async function getFirstPurchaseUsers() {
     })
     .all();
 
-  metrics.timing("get_firstpurchaseusers", performance.now() - tsStart);
+  metrics.timing("airtable.get_firstpurchaseusers", performance.now() - tsStart);
   return data;
 }
 
