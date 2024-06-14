@@ -1,5 +1,5 @@
 export enum FlowSignals {
-  fiveHoursCompleted,
+  minimumHoursConfirmed,
   verificationSubmitted,
   verificationConfirmed,
   isFullUser,

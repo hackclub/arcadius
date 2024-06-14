@@ -8,7 +8,7 @@ export async function slackInvite(req, res) {
     if (!req.headers.authorization) {
       return res.status(403).json({ error: "No credentials sent!" });
     } else if (
-      req.headers.authorization != `Bearer ${process.env.AUTH_TOKEN}`
+      req.headers.authorization != `Bearer ${process.env.TrashPandaSecret}`
     ) {
       return res.status(403).json({ error: "Invalid credentials sent!" });
     } else {

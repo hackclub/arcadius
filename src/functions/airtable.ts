@@ -92,7 +92,7 @@ export async function getInvitationFaults() {
 
   const data = await slackJoinsAirtable
     .select({
-      filterByFormula: `AND(NOT({Invited}), NOT({Denied}) IS_AFTER({Created At}, DATETIME_PARSE('2024-07-12')))`,
+      // filterByFormula: `AND(NOT({Invited}), NOT({Denied}), IS_AFTER({Created At}, DATETIME_PARSE('2024-07-12')))`,
     })
     .all();
 
@@ -108,7 +108,16 @@ export async function getFirstPurchaseUsers() {
   // Return all users for which the Orders field has a length of 1, and the firstPurchaseSubmitted field is false
   const data = await verificationsAirtable
     .select({
-      filterByFormula: `AND(LEN({Orders}) = 1, NOT({firstPurchaseSubmitted}))`,
+      // filterByFormula: `AND(LEN({Orders}) = 1, NOT({firstPurchaseSubmitted}))`,
+    })
+    .all();
+}
+
+// Get all users where {Minutes (Approved)} is greater than 180
+export async function getMinimumHoursConfirmedUsers() {
+  return await hoursAirtable
+    .select({
+      // filterByFormula: `AND({Minutes (Approved)} > 180, NOT({minimumHoursConfirmed}))`,
     })
     .all();
 
