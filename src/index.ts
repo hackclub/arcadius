@@ -12,13 +12,14 @@ import { health } from "./endpoints/health";
 import { index } from "./endpoints/index";
 import { slackInvite } from "./endpoints/slack-invite";
 import { tmp } from "./endpoints/tmp";
-import { verification } from "./endpoints/verification";
 import {
   getFirstPurchaseUsers,
   getHoursUsers,
   getInvitationFaults,
   getVerifiedUsers,
   hoursAirtable,
+  ordersAirtable,
+  sessionsAirtable,
 } from "./functions/airtable";
 import { fetchUsers } from "./functions/jankySlackCrap";
 import {
@@ -30,6 +31,7 @@ import {
 import { arcadeStartInteraction } from "./interactions/arcade-start";
 import metrics from "./metrics";
 import { inviteUser } from "./util/invite-user";
+import { upgradeUser } from "./util/upgrade-user";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -83,9 +85,11 @@ receiver.router.use(express.json());
 receiver.router.get("/", index);
 receiver.router.get("/ping", health);
 receiver.router.get("/up", health);
-receiver.router.post("/verify", verification);
 receiver.router.post("/slack-invite", slackInvite);
 receiver.router.post("/tmp", tmp);
+receiver.router.post("/demo", (req) => {
+  demo(req.body.userId);
+});
 
 receiver.router.use(
   responseTime((req, res, time) => {
@@ -139,10 +143,55 @@ const logStartup = async (app: App) => {
   // });
 };
 
+async function demo(userId: string) {
+  console.log(`Demoing ${userId}`);
+  try {
+    const userRecord = (
+      await hoursAirtable
+        .select({ filterByFormula: `{Slack ID} = '${userId}'` })
+        .all()
+    ).at(0);
+
+    if (userRecord) {
+      const fields = userRecord.fields;
+      console.log(`Running a demo for ${fields.Name} (${userId})`);
+      // console.log(`Running a demo for ${fields.Name} (${userId})`, fields);
+
+      const sessionIds = fields["Sessions"] as Array<string>;
+      if (sessionIds) {
+        console.log(`Destroying ${sessionIds.length} sessions`);
+        await sessionsAirtable.destroy(sessionIds);
+      }
+
+      const orderIds = fields["Orders"] as Array<string>;
+      if (orderIds) {
+        console.log(`Destroying ${orderIds.length} orders`);
+        await ordersAirtable.destroy(orderIds);
+      }
+
+      await hoursAirtable.update(userRecord.id, {
+        verificationDmSent: false,
+        minimumHoursSubmitted: false,
+        minimumHoursConfirmed: false,
+        verificationConfirmed: false,
+        isFullUser: false,
+        firstPurchaseSubmitted: false,
+      });
+
+      sendInitalDM(client, userId);
+    } else {
+      console.error(
+        colors.bgRed.bold(`No existing arcade record for slack ID ${userId}`)
+      );
+    }
+  } catch (err) {
+    console.error(
+      colors.bgRed.bold(`Error running demo for ${userId}: ${err}`)
+    );
+  }
+}
+
 async function jobCheckUsers() {
-  console.log(
-    colors.yellow("Running cron job to check full users against arcade users.")
-  );
   let pUsers = await getHoursUsers();
 
   pUsers.forEach(async (user) => {
@@ -164,18 +213,13 @@ async function jobCheckUsers() {
           isFullUser: true,
         });
       } catch (err) {
-        console.error(colors.red(`Error updating user: ${err}`));
+        console.error(colors.bgRed.bold(`Error updating user: ${err}`));
       }
     }
   });
 }
 
 async function checkUserHours() {
-  console.log(
-    colors.blue(
-      "Running cron job to check for users with more than minimum hours."
-    )
-  );
   let USERS = await getHoursUsers();
   let usersWithMoreThanMinimumHours = USERS.filter((user) => {
     let minutesApproved = Number(user["Minutes (Approved)"] ?? 0);
@@ -191,9 +235,6 @@ async function checkUserHours() {
   // if not, send them a DM
   if (usersWithMoreThanMinimumHours.length > 0) {
     usersWithMoreThanMinimumHours.forEach(async (user) => {
-      // console.log(user);
-      // console.log(user["Slack ID"], user["verificationDmSent"]);
-
       if (user["verificationDmSent"] === true && user["isFullUser"] === true) {
         return;
       } else {
@@ -207,7 +248,7 @@ async function checkUserHours() {
             ) {
               await sendAlreadyVerifiedDM(app.client, user["Slack ID"]).then(
                 () => {
-                  // upgradeUser(user["Slack ID"]);
+                  upgradeUser(client, user["Slack ID"]);
                 }
               );
             } else {
@@ -226,7 +267,7 @@ async function checkUserHours() {
                 verificationDmSent: true,
               });
             } catch (err) {
-              console.error(colors.red(`Error: ${err}`));
+              console.error(colors.bgRed.bold(`[ERROR]: ${err}`));
             }
           } else {
             return;
@@ -268,67 +309,79 @@ async function pollFirstPurchaseUsers() {
 
 app.start(process.env.PORT || 3000).then(async () => {
   await logStartup(app);
-  console.log("⚡️ Bolt app is running in env", process.env.NODE_ENV);
-
-  // Heartbeat
-  new CronJob(
-    "0 * * * * *",
-    async function () {
-      metrics.increment("heartbeat");
-    },
-    null,
-    true,
-    "America/New_York"
+  console.log(
+    colors.bgCyan(`⚡️ Bolt app is running in env ${process.env.NODE_ENV}`)
   );
-
-  new CronJob(
-    "*/3 * * * * *",
-    async function () {
-      await jobCheckUsers();
-    },
-    null,
-    true,
-    "America/New_York"
-  );
-
-  new CronJob(
-    "*/5 * * * * *",
-    async function () {
-      await checkUserHours();
-    },
-    null,
-    true,
-    "America/New_York"
-  );
-
-  new CronJob(
-    "*/5 * * * * *",
-    async function () {
-      await pollInvitationFaults();
-    },
-    null,
-    true,
-    "America/New_York"
-  );
-
-  new CronJob(
-    "*/5 * * * * *",
-    async function () {
-      await pollFirstPurchaseUsers();
-    }, // onTick
-    null, // onComplete
-    true, // start
-    "America/New_York" // timeZone
-  );
-
-  // new CronJob(
-  //   "0 * * * * *",
-  //   function()
-  //   null,
-  //   true,
-  //   "America/New_York"
-  // );
 });
+
+// Heartbeat
+new CronJob(
+  "0 * * * * *",
+  async function () {
+    metrics.increment("heartbeat");
+  },
+  null,
+  true,
+  "America/New_York"
+);
+
+new CronJob(
+  "*/3 * * * * *",
+  async function () {
+    console.log(
+      colors.magenta("[CRON]: Checking full users against arcade users.")
+    );
+    await jobCheckUsers();
+  },
+  null,
+  true,
+  "America/New_York"
+);
+
+new CronJob(
+  "*/5 * * * * *",
+  async function () {
+    console.log(
+      colors.magenta("[CRON]: Checking for users with more than minimum hours.")
+    );
+    await checkUserHours();
+  },
+  null,
+  true,
+  "America/New_York"
+);
+
+new CronJob(
+  "*/5 * * * * *",
+  async function () {
+    console.log(
+      colors.magenta("[CRON]: Checking for slack invitation faults.")
+    );
+    await pollInvitationFaults();
+  },
+  null,
+  true,
+  "America/New_York"
+);
+
+new CronJob(
+  "*/5 * * * * *",
+  async function () {
+    console.log(colors.magenta("[CRON]: Polling for first purchase users."));
+    await pollFirstPurchaseUsers();
+  }, // onTick
+  null, // onComplete
+  true, // start
+  "America/New_York" // timeZone
+);
+
+// new CronJob(
+//   "0 * * * * *",
+//   function()
+//   null,
+//   true,
+//   "America/New_York"
+// );
 
 const client: any = app.client;
 export { app, client };

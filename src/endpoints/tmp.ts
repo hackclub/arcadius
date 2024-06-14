@@ -12,7 +12,7 @@ export async function tmp(req: Request, res: Response) {
   // fetchUsers(email);
 
   await upgradeUser(client, email).then((result) => {
-    console.log(result);
+    // console.log(result);
   });
 
   // await getVerificationsUsers();

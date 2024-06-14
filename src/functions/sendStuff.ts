@@ -1,5 +1,7 @@
 import axios from "axios";
-import metrics from "../metrics"
+import metrics from "../metrics";
+
+const haccoonId = "U078FB76K5F";
 
 async function postImage(client) {
   // const file = await axios({
@@ -28,8 +30,8 @@ async function postAudio(client) {
     headers: {
       "User-Agent": "jasper@hackclub.com",
     },
-    });
-    
+  });
+
   metrics.increment("http.request.api_files-uploadv2");
   const response = await client.files.uploadV2({
     channel: "C077MH3QRFU",
@@ -41,25 +43,28 @@ async function postAudio(client) {
 
 async function sendInitalDM(client, userId) {
   metrics.increment("http.request.api_chat-postmessage");
+  const channel = await client.conversations
+    .open({
+      users: [userId, haccoonId].join(","),
+    })
+    .then((res) => res.channel.id);
+
   await client.chat.postMessage({
-    channel: userId,
+    channel,
     blocks: [
       {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `Congratulations hacker, you have completed Step 1 of the Summer Arcade :summer::joystick:
+          text: `Welcome hacker, it's so good to see you!! You know what this means, right? You've made it to Step 2 of the Hack Club Arcade :summer::joystick:
 
-1. *Join Hack Club ✓*
+1. *Join the Slack ✓*
 2. *Hack on Projects* ← _You are here_
 3. Get Cool Stuff
 
-*Step 2: Complete Your First Five Hack Hours*
-The Hack Club Slack is a grand labyrinth with hundreds of channels. For now, we'll start with just the ones you need for the Arcade.
+Hack Club is a rather _big_ place, the Arcade is just one little piece of it. I would love to show you around, but I'm afraid these old dinosaur bones don't move like they used to…
 
-*Type \`/hack\` to begin!*
-
-One more thing… please make sure to complete the <https://hack.club/arcade-eligibility?slack_id=${userId}|eligibility verification form>!`,
+My dear friend <@U078FB76K5F> can give you a tour though! *Type \`/hack\` to summon her*`,
         },
       },
     ],
@@ -91,9 +96,9 @@ async function sendAlreadyVerifiedDM(client, userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `Amazing, you're ready for Step 3 of the Summer Arcade!!
+          text: `Well done, well done!!
 
-1. *Join Hack Club ✓*
+1. *Join the Slack ✓*
 2. *Hack on Projects ✓*
 3. *Get Cool Stuff* ← _You are here_
 
@@ -129,7 +134,7 @@ export async function sendFirstPurchaseSubmittedDM(client, userId) {
           type: "mrkdwn",
           text: `You have arrived. Step 3 is complete, your prize is on its way :gift:
 
-1. *Join Hack Club ✓*
+1. *Join the Slack ✓*
 2. *Hack on Projects ✓*
 3. *Get Cool Stuff ✓*
 
