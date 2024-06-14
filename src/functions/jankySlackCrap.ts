@@ -1,5 +1,10 @@
+import metrics from "../metrics";
+
 export const fetchUsers = async (email) => {
   const cookieValue = `d=${process.env.JM_SLACK_COOKIE}`;
+  
+  metrics.increment("http.request.api_users-admin-fetchTeamUsers")
+  const startTs = performance.now()
 
   const a = await fetch(
     "https://hackclub.slack.com/api/users.admin.fetchTeamUsers?_x_id=3592b959-1718245056.144&slack_route=T0266FRGM&_x_version_ts=noversion&fp=51&_x_num_retries=0",
@@ -27,5 +32,6 @@ export const fetchUsers = async (email) => {
 
   const response = await a.json();
 
+  metrics.timing("http.requests.api_users-admin-fetchTeamUsers", performance.now() - startTs);
   return response.items?.[0]?.email;
 };

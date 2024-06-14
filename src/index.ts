@@ -5,7 +5,9 @@ import { App, ExpressReceiver } from "@slack/bolt";
 import colors from "colors";
 import { CronJob } from "cron";
 import express from "express";
+import responseTime from "response-time";
 
+import metrics from "./metrics";
 import { health } from "./endpoints/health";
 import { index } from "./endpoints/index";
 import { slackInvite } from "./endpoints/slack-invite";
@@ -27,6 +29,7 @@ import {
 } from "./functions/sendStuff";
 import { arcadeStartInteraction } from "./interactions/arcade-start";
 import { inviteUser } from "./util/invite-user";
+import axios from "axios";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -40,6 +43,7 @@ const app = new App({
 });
 
 app.event(/.*/, async ({ event, client }) => {
+  metrics.increment(`slack.event.${event.type}`)
   switch (event.type) {
     case "team_join":
       await sendInitalDM(client, event.user.id);
@@ -52,6 +56,9 @@ app.action(/.*?/, async (args) => {
   const user = body.user.id;
 
   await ack();
+
+  // @ts-ignore
+  metrics.increment(`slack.action.${payload.value}`);
 
   // @ts-ignore
   switch (payload.value) {
@@ -67,6 +74,7 @@ app.action(/.*?/, async (args) => {
 
 app.command(/.*?/, async ({ ack, body, client }) => {
   await ack();
+  metrics.increment(`slack.command.${body.command}`)
 
   switch (body.command) {
     case "/dm-me":
@@ -82,6 +90,47 @@ receiver.router.get("/up", health);
 receiver.router.post("/verify", verification);
 receiver.router.post("/slack-invite", slackInvite);
 receiver.router.post("/tmp", tmp);
+
+receiver.router.use(
+    responseTime((req, res, time) => {
+        const stat = (req.method + "/" + req.url?.split("/")[1])
+            .toLowerCase()
+            .replace(/[:.]/g, "")
+            .replace(/\//g, "_");
+
+        const httpCode = res.statusCode;
+        const timingStatKey = `http.response.${stat}`;
+        const codeStatKey = `http.response.${stat}.${httpCode}`;
+        metrics.timing(timingStatKey, time);
+        metrics.increment(codeStatKey, 1);
+    })
+);
+
+app.use(async ({payload, next}) => {
+  metrics.increment(`slack.request.${payload.type}`)
+  await next();
+})
+
+// Add metric interceptors for axios
+axios.interceptors.request.use((config: any) => {
+  config.metadata = {startTs: performance.now()}
+  return config;
+})
+
+axios.interceptors.response.use((res: any) => {
+  const stat = (res.config.method + "/" + res.config.url?.split("/")[1])
+      .toLowerCase()
+      .replace(/[:.]/g, "")
+      .replace(/\//g, "_");
+
+  const httpCode = res.status;
+  const timingStatKey = `http.request.${stat}`;
+  const codeStatKey = `http.request.${stat}.${httpCode}`;
+  metrics.timing(timingStatKey, performance.now() - res.config.metadata.startTs);
+  metrics.increment(codeStatKey, 1);
+
+  return res;
+})
 
 const logStartup = async (app: App) => {
   // await app.client.chat.postMessage({
@@ -102,6 +151,10 @@ const logStartup = async (app: App) => {
         );
       })
       .then(async () => {
+        new CronJob("0 * * * * *", async function() {
+          metrics.increment("heartbeat")
+        }, null, true, "America/New_York")
+
         new CronJob(
           "*/3 * * * * *",
           async function () {
