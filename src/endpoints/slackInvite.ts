@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 
-export async function slackInvite(req, res) {
+export async function slackInviteEndpoint(req, res) {
   // this endpoint is hit by the form on hackclub.com/arcade
   try {
     if (!req.headers.authorization) {

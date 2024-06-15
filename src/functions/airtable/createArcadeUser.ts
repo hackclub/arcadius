@@ -1,8 +1,8 @@
 import { hoursAirtable } from "../../lib/airtable";
-import { flowTriggeredByType } from "../../types/flowTriggeredBy";
+import { flowTriggeredByEnum } from "../../types/flowTriggeredBy";
 import { slog } from "../../util/Logger";
 
-export async function createArcadeUser(slackId, email, name: String, flowTriggeredBy: flowTriggeredByType ) {
+export async function createArcadeUser(slackId, email, name: String, flowTriggeredBy: flowTriggeredByEnum ) {
 slog(`Creating Arcade user ${name} with email ${email} triggered by ${flowTriggeredBy}`, "info");
 
 const userRecord = (
@@ -12,14 +12,16 @@ const userRecord = (
 ).at(0);
 
 if (!userRecord) {
-  return await hoursAirtable.create({
+  // @ts-ignore
+  const result = await hoursAirtable.create({
     'Slack ID': slackId,
     Email: email,
     Name: name,
-  }).then((record) => {
+    'Flow Triggered By': flowTriggeredBy,
+    'Initial Banked Minutes': 180,
+  })
     slog(`Arcade user ${name} created with email ${email} triggered by ${flowTriggeredBy}`, "info");
-    return record;
-  });
+    return result
 } else {
   console.log("User already exists!");
   slog(`Arcade user ${name} already exists, user NOT created.`, "info")

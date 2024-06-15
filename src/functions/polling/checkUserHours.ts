@@ -8,9 +8,9 @@ import { upgradeSlackUser } from "../upgradeSlackUser";
 
 export async function checkUserHours() {
   let USERS = await getHoursUsers();
-  let usersWithMoreThanMinimumHours = USERS.filter((user) => {
-    let minutesApproved = Number(user["Minutes (Approved)"] ?? 0);
-    return minutesApproved / 60 >= 3;
+  let usersWithMoreThanNoMinutes = USERS.filter((user) => {
+    let minutesAll = Number(user["Minutes (All)"] ?? 0);
+    return minutesAll > 0;
   });
 
   let tmp = await getVerifiedUsers();
@@ -20,8 +20,8 @@ export async function checkUserHours() {
 
   // check if the user has minimumHoursConfirmed === true
   // if not, send them a DM
-  if (usersWithMoreThanMinimumHours.length > 0) {
-    usersWithMoreThanMinimumHours.forEach(async (user) => {
+  if (usersWithMoreThanNoMinutes.length > 0) {
+    usersWithMoreThanNoMinutes.forEach(async (user) => {
       if (user["verificationDmSent"] === true && user["isFullUser"] === true) {
         return;
       } else {

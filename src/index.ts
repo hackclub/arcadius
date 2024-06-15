@@ -8,10 +8,11 @@ import express from "express";
 import responseTime from "response-time";
 
 import { CronJob } from "cron";
-import { health } from "./endpoints/health";
-import { index } from "./endpoints/index";
-import { slackInvite } from "./endpoints/slackInvite";
-import { createArcadeUser } from "./functions/airtable/createArcadeUser";
+import { getDmChannelEndpoint } from "./endpoints/getDmChannel";
+import { healthEndpoint } from "./endpoints/health";
+import { indexEndpoint } from "./endpoints/index";
+import { slackInviteEndpoint } from "./endpoints/slackInvite";
+import { createArcadeUser } from "./func/createArcadeUser";
 import { checkUserHours } from "./functions/polling/checkUserHours";
 import { jobCheckUsers } from "./functions/polling/jobCheckUsers";
 import { pollFirstPurchaseUsers } from "./functions/polling/pollFirstPurchaseUsers";
@@ -26,7 +27,7 @@ import {
   sessionsAirtable
 } from "./lib/airtable";
 import metrics from "./metrics";
-import { flowTriggeredByType } from "./types/flowTriggeredBy";
+import { flowTriggeredByEnum } from "./types/flowTriggeredBy";
 import logger from "./util/Logger";
 
 const receiver = new ExpressReceiver({
@@ -43,16 +44,16 @@ const app = new App({
 app.event(/.*/, async ({ event, client }) => {
   metrics.increment(`slack.event.${event.type}`);
   switch (event.type) {
-    case "team_join":
-      const userInfo = await client.users.info({ user: event.user.id });
-      console.log(userInfo);
-      const email = userInfo.email;
-      const name = userInfo.real_name as string;
-      let flowTriggeredBy: flowTriggeredByType = "arcadius"
-      await createArcadeUser(event.user.id, email, name, flowTriggeredBy);
-      const channel = await sendInitalDM(client, event.user.id);
+    // case "team_join":
+    //   const userInfo = await client.users.info({ user: event.user.id });
+    //   console.log(userInfo);
+    //   const email = userInfo.email;
+    //   const name = userInfo.real_name as string;
+    //   let flowTriggeredBy: flowTriggeredByType = "arcadius"
+    //   await createArcadeUser(event.user.id, email, name, flowTriggeredBy);
+    //   const channel = await sendInitalDM(client, event.user.id);
 
-      break;
+    //   break;
   }
 });
 
@@ -82,36 +83,45 @@ app.action(/.*?/, async (args) => {
 app.command(/.*?/, async ({ ack, body, client }) => {
   await ack();
   metrics.increment(`slack.command.${body.command}`);
-
   // This is not used
 });
 
 receiver.router.use(express.json());
-receiver.router.get("/", index);
-receiver.router.get("/ping", health);
-receiver.router.get("/up", health);
-receiver.router.post("/slack-invite", slackInvite);
+receiver.router.get("/", indexEndpoint);
+receiver.router.get("/ping", healthEndpoint);
+receiver.router.get("/up", healthEndpoint);
+receiver.router.post("/slack-invite", slackInviteEndpoint);
 receiver.router.post("/existing-user-start", async (req, res) => {
-  const userId = req.body.userId;
-  const user = (await client.users.info({ user: userId })).user;
-  try {
-    const arcadeUser = await createArcadeUser(
-      userId,
-      user.profile.email,
-      user.profile.real_name,
-      "hedi"
-    );
-    const channel = await sendInitalDM(client, req.body.userId);
-    res.json({ channel, arcadeUserId: arcadeUser.id });
-  } catch (err) {
-    console.error(err);
-    res.json({});
-  }
+  // todo: AUTHENTICATE ME!
+const userId = req.body.userId;
+const user = (await client.users.info({ user: userId })).user;
+try {
+
+  let triggeredBy:flowTriggeredByEnum = flowTriggeredByEnum.hedi;
+
+  const arcadeUser = await createArcadeUser(
+    userId,
+    user.profile.email,
+    user.profile.real_name,
+    triggeredBy
+  );
+  const channel = await sendInitalDM(client, req.body.userId);
+  // @ts-ignore
+  let airtableRecId = arcadeUser.id;
+
+  res.status(200).json({ channelId: channel, airtableRecId: airtableRecId});
+
+} catch (err) {
+  console.error(err);
+  res.json({});
+}
 });
 receiver.router.post("/demo", (req) => {
   demo(req.body.userId);
   // upgradeSlackUser(client, "U077HDMHF8E");
 });
+receiver.router.get("/get-dm-channel", getDmChannelEndpoint);
+
 
 receiver.router.use(
   responseTime((req, res, time) => {

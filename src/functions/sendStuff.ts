@@ -1,6 +1,7 @@
 import axios from "axios";
-import { updateUserChannel } from "../lib/airtable";
 import metrics from "../metrics";
+import { updateUserChannel } from "./airtable/updateUserChannel";
+import { getDmChannelFromAirtable } from "./getDmChannelFromAirtable";
 
 const haccoonId = "U078FB76K5F";
 
@@ -43,12 +44,14 @@ My dear friend <@U078FB76K5F> can give you a tour though!`,
               emoji: true,
             },
             action_id: "summon_haccoon_initial",
-            value: {channel},
+            value: channel,
           },
         ],
       },
     ],
   });
+
+  return channel;
 }
 
 async function postRacoonInitalInstructions(payload) {
@@ -84,9 +87,12 @@ anyway, Arcade?? try it try it!!
 }
 
 async function sendVerificationDM(client, userId) {
+
+  let dmChannel = await getDmChannelFromAirtable({slackId: userId});
+
   metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
-    channel: userId,
+    channel: dmChannel,
     unfurl_links: false,
     unfurl_media: false,
     blocks: [
@@ -103,8 +109,11 @@ async function sendVerificationDM(client, userId) {
 
 async function sendAlreadyVerifiedDM(client, userId, internalID) {
   metrics.increment("http.request.api_chat-postmessage");
+
+  let dmChannel = await getDmChannelFromAirtable({slackId: userId});
+
   await client.chat.postMessage({
-    channel: userId,
+    channel: dmChannel,
     unfurl_links: false,
     unfurl_media: false,
     blocks: [
@@ -141,8 +150,11 @@ You can keep banking hours, or <https:/hack.club/arcade-shop?slack_id=${userId}?
 
 export async function sendFirstPurchaseSubmittedDM(client, userId) {
   metrics.increment("http.request.api_chat-postmessage");
+
+  let dmChannel = await getDmChannelFromAirtable({slackId: userId});
+
   await client.chat.postMessage({
-    channel: userId,
+    channel: dmChannel,
     blocks: [
       {
         type: "section",
