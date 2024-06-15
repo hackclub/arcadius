@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-import { inviteUser } from "../util/invite-user";
 
 export async function slackInvite(req, res) {
   // this endpoint is hit by the form on hackclub.com/slack
@@ -16,7 +15,7 @@ export async function slackInvite(req, res) {
 
       const result = { email };
       if (email) {
-        const { ok, error } = await inviteUser(client, req.body);
+        // const { ok, error } = await inviteUser(client, req.body);
         result.ok = ok;
         result.error = error;
       }

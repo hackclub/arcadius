@@ -21,7 +21,7 @@ async function sendInitalDM(client, userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `Welcome hacker, it's so good to see you! You know what this means, right? You've made it to Step 2 of the Hack Club Arcade!! :summer::joystick:
+          text: `Welcome hacker, it's so good to see you! You know what this means, right? You've made it to Step 2 of the Hack Club Arcade! :summer::joystick:
 
 1. *Join the Slack ✓*
 2. *Hack on Projects* ← _You are here_
@@ -43,7 +43,7 @@ My dear friend <@U078FB76K5F> can give you a tour though!`,
               emoji: true,
             },
             action_id: "summon_haccoon_initial",
-            value: channel,
+            value: {channel},
           },
         ],
       },
@@ -165,5 +165,5 @@ export {
   postRacoonInitalInstructions,
   sendAlreadyVerifiedDM,
   sendInitalDM,
-  sendVerificationDM,
+  sendVerificationDM
 };

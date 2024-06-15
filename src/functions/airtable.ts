@@ -152,6 +152,8 @@ export async function getMinimumHoursConfirmedUsers() {
 }
 
 export async function updateUserChannel(slackId, channelId) {
+  metrics.increment("airtable.update_userchannel");
+  const tsStart = performance.now();
   try {
     const user = (
       await hoursAirtable
@@ -162,6 +164,7 @@ export async function updateUserChannel(slackId, channelId) {
       hoursAirtable.update(user.id, {
         dmChannel: channelId,
       });
+      performance.now() - tsStart;
     }
   } catch (err) {
     console.error(err);
@@ -194,5 +197,5 @@ export {
   ordersAirtable,
   sessionsAirtable,
   slackJoinsAirtable,
-  verificationsAirtable,
+  verificationsAirtable
 };

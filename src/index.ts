@@ -74,10 +74,12 @@ app.action(/.*?/, async (args) => {
   // @ts-ignore
   switch (payload.action_id) {
     case "fake_it_final":
+      metrics.increment("slack.action.fake_it_final");
       await sendFirstPurchaseSubmittedDM(client, user);
       break;
 
     case "summon_haccoon_initial":
+      metrics.increment("slack.action.summon_haccoon_initial");
       await postRacoonInitalInstructions(payload);
       break;
   }
@@ -377,8 +379,8 @@ new CronJob(
 new CronJob(
   "*/3 * * * * *",
   async function () {
-    // logger("Checking full users against arcade users.", "cron");
-    // await jobCheckUsers();
+    logger("Checking full users against arcade users.", "cron");
+    await jobCheckUsers();
   },
   null,
   true,
@@ -388,8 +390,8 @@ new CronJob(
 new CronJob(
   "*/5 * * * * *",
   async function () {
-    // logger("Checking for users with more than minimum hours.", "cron");
-    // await checkUserHours();
+    logger("Checking for users with more than minimum hours.", "cron");
+    await checkUserHours();
   },
   null,
   true,
@@ -401,7 +403,8 @@ new CronJob(
   "*/5 * * * * *",
   async function () {
     // logger("Checking for slack invitation faults.", "cron");
-    await pollInvitationFaults();
+    // DO NOT UNCOMMENT THIS RIGHT NOW!!!!!!!!!!!!!! (Remeber to reenable slack joins base access on the token)
+    // await pollInvitationFaults();
   },
   null,
   true,
@@ -411,7 +414,7 @@ new CronJob(
 new CronJob(
   "*/5 * * * * *",
   async function () {
-    // logger("Polling for first purchase users.", "cron");
+    logger("Polling for first purchase users.", "cron");
     await pollFirstPurchaseUsers();
   }, // onTick
   null, // onComplete
