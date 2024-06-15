@@ -2,7 +2,7 @@
 
 
 export async function slackInvite(req, res) {
-  // this endpoint is hit by the form on hackclub.com/slack
+  // this endpoint is hit by the form on hackclub.com/arcade
   try {
     if (!req.headers.authorization) {
       return res.status(403).json({ error: "No credentials sent!" });

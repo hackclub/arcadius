@@ -10,31 +10,24 @@ import responseTime from "response-time";
 import { CronJob } from "cron";
 import { health } from "./endpoints/health";
 import { index } from "./endpoints/index";
-import { slackInvite } from "./endpoints/slack-invite";
-import { tmp } from "./endpoints/tmp";
-import {
-  createArcadeUser,
-  getFirstPurchaseUsers,
-  getHoursUsers,
-  getInvitationFaults,
-  getVerifiedUsers,
-  hoursAirtable,
-  ordersAirtable,
-  sessionsAirtable,
-  slackJoinsAirtable,
-} from "./functions/airtable";
-import { fetchUsers } from "./functions/jankySlackCrap";
+import { slackInvite } from "./endpoints/slackInvite";
+import { createArcadeUser } from "./functions/airtable/createArcadeUser";
+import { checkUserHours } from "./functions/polling/checkUserHours";
+import { jobCheckUsers } from "./functions/polling/jobCheckUsers";
+import { pollFirstPurchaseUsers } from "./functions/polling/pollFirstPurchaseUsers";
 import {
   postRacoonInitalInstructions,
-  sendAlreadyVerifiedDM,
   sendFirstPurchaseSubmittedDM,
   sendInitalDM,
-  sendVerificationDM,
 } from "./functions/sendStuff";
+import {
+  hoursAirtable,
+  ordersAirtable,
+  sessionsAirtable
+} from "./lib/airtable";
 import metrics from "./metrics";
+import { flowTriggeredByType } from "./types/flowTriggeredBy";
 import logger from "./util/Logger";
-import { inviteUser } from "./util/invite-user";
-import { upgradeUser } from "./util/upgrade-user";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -54,8 +47,9 @@ app.event(/.*/, async ({ event, client }) => {
       const userInfo = await client.users.info({ user: event.user.id });
       console.log(userInfo);
       const email = userInfo.email;
-      const name = userInfo.real_name;
-      await createArcadeUser(event.user.id, email, name, false);
+      const name = userInfo.real_name as string;
+      let flowTriggeredBy: flowTriggeredByType = "arcadius"
+      await createArcadeUser(event.user.id, email, name, flowTriggeredBy);
       const channel = await sendInitalDM(client, event.user.id);
 
       break;
@@ -97,8 +91,7 @@ receiver.router.get("/", index);
 receiver.router.get("/ping", health);
 receiver.router.get("/up", health);
 receiver.router.post("/slack-invite", slackInvite);
-receiver.router.post("/tmp", tmp);
-receiver.router.post("/begin", async (req, res) => {
+receiver.router.post("/existing-user-start", async (req, res) => {
   const userId = req.body.userId;
   const user = (await client.users.info({ user: userId })).user;
   try {
@@ -106,7 +99,7 @@ receiver.router.post("/begin", async (req, res) => {
       userId,
       user.profile.email,
       user.profile.real_name,
-      true
+      "hedi"
     );
     const channel = await sendInitalDM(client, req.body.userId);
     res.json({ channel, arcadeUserId: arcadeUser.id });
@@ -117,7 +110,7 @@ receiver.router.post("/begin", async (req, res) => {
 });
 receiver.router.post("/demo", (req) => {
   demo(req.body.userId);
-  // upgradeUser(client, "U077HDMHF8E");
+  // upgradeSlackUser(client, "U077HDMHF8E");
 });
 
 receiver.router.use(
@@ -173,25 +166,6 @@ const logStartup = async (app: App) => {
   });
 };
 
-// async function begin(userId: string) {
-//   console.log(`Beginning ${userId}`);
-//   try {
-//     const userRecord = (
-//       await hoursAirtable
-//         .select({ filterByFormula: `{Slack ID} = '${userId}'` })
-//         .all()
-//     ).at(0);
-
-//     if (userRecord) {
-//       sendInitalDM(client, userId);
-//     } else {
-//       logger(`No existing arcade record for slack ID ${userId}`, "error");
-//     }
-//   } catch (err) {
-//     logger(`Error running demo for ${userId}: ${err}`, "error");
-//   }
-// }
-
 async function demo(userId: string) {
   console.log(`Demoing ${userId}`);
   try {
@@ -233,128 +207,6 @@ async function demo(userId: string) {
     }
   } catch (err) {
     logger(`Error running demo for ${userId}: ${err}`, "error");
-  }
-}
-
-async function jobCheckUsers() {
-  let pUsers = await getHoursUsers();
-
-  pUsers.forEach(async (user) => {
-    // run fetchUsers for the user
-    let tU = await fetchUsers(user["Email"]);
-
-    if (tU == user["Email"]) {
-      // mark the user as a fullUser in airtable
-      try {
-        // find the airtable record for the user
-        const userRec = await hoursAirtable
-          .select({
-            filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
-            pageSize: 1,
-          })
-          .firstPage();
-        // update the record
-        await hoursAirtable.update(userRec[0].id, {
-          isFullUser: true,
-        });
-      } catch (err) {
-        logger(`Error updating user: ${err}`, "error");
-      }
-    }
-  });
-}
-
-async function checkUserHours() {
-  let USERS = await getHoursUsers();
-  let usersWithMoreThanMinimumHours = USERS.filter((user) => {
-    let minutesApproved = Number(user["Minutes (Approved)"] ?? 0);
-    return minutesApproved / 60 >= 3;
-  });
-
-  let tmp = await getVerifiedUsers();
-
-  // make an array of 'Hack Club Slack ID's
-  let verifiedUsers = tmp.map((user) => user["Hack Club Slack ID"]);
-
-  // check if the user has minimumHoursConfirmed === true
-  // if not, send them a DM
-  if (usersWithMoreThanMinimumHours.length > 0) {
-    usersWithMoreThanMinimumHours.forEach(async (user) => {
-      if (user["verificationDmSent"] === true && user["isFullUser"] === true) {
-        return;
-      } else {
-        if (user["isFullUser"] === true) {
-          return;
-        } else {
-          if (user["verificationDmSent"] !== true) {
-            if (
-              verifiedUsers.includes(user["Slack ID"]) &&
-              user["verificationDmSent"]
-            ) {
-              await sendAlreadyVerifiedDM(
-                app.client,
-                user["Slack ID"],
-                user["Internal ID"]
-              ).then(() => {
-                upgradeUser(client, user["Slack ID"]);
-              });
-            } else {
-              await sendVerificationDM(app.client, user["Slack ID"]);
-            }
-
-            try {
-              const userRec = await hoursAirtable
-                .select({
-                  filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
-                  pageSize: 1,
-                })
-                .firstPage();
-
-              await hoursAirtable.update(userRec[0].id, {
-                verificationDmSent: true,
-              });
-            } catch (err) {
-              logger(`Error updating user: ${err}`, "error");
-            }
-          } else {
-            return;
-          }
-        }
-      }
-    });
-  }
-}
-
-async function pollInvitationFaults() {
-  try {
-    const uninvitedUsers = await getInvitationFaults();
-
-    uninvitedUsers
-      .map((record) => record)
-      .forEach((record) => {
-        let email = record.fields["Email"];
-
-        inviteUser({ email }).then((v) => {
-          if (v) slackJoinsAirtable.update(record.id, { Invited: true });
-        });
-      });
-  } catch (err) {
-    logger(`Error polling invitation faults: ${err}`, "error");
-  }
-}
-
-async function pollFirstPurchaseUsers() {
-  if (0 > 1) {
-    const users = await getFirstPurchaseUsers();
-
-    users.forEach((record) => {
-      sendFirstPurchaseSubmittedDM(app.client, record.get("Slack ID"));
-
-      // Update the associated record for this user in the hoursAirtable to set firstPurchaseSubmitted to true
-      hoursAirtable.update(record.id, {
-        firstPurchaseSubmitted: true,
-      });
-    });
   }
 }
 

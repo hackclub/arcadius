@@ -4,7 +4,7 @@ dotenv.config();
 
 import colors from "colors";
 
-async function slog(logMessage) {
+async function slog(logMessage, type: LogType) {
   if (process.env.NODE_ENV === "production") {
     await client.chat.postMessage({
       channel: "C077F5AVB38",

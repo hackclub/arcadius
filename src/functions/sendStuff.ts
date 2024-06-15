@@ -1,6 +1,6 @@
 import axios from "axios";
+import { updateUserChannel } from "../lib/airtable";
 import metrics from "../metrics";
-import { updateUserChannel } from "./airtable";
 
 const haccoonId = "U078FB76K5F";
 

@@ -3,8 +3,8 @@ dotenv.config();
 
 import { App } from "@slack/bolt";
 
-import metrics from "src/metrics";
-import logger, { slog } from "./Logger";
+import metrics from "../metrics";
+import logger from "../util/Logger";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN!,
@@ -13,7 +13,7 @@ const app = new App({
 });
 const client = app.client;
 
-export async function upgradeUser(client, slackId) {
+export async function upgradeSlackUser(client, slackId) {
   metrics.increment("slack.upgradeUser");
   const tsStart = performance.now();
 
@@ -21,7 +21,7 @@ export async function upgradeUser(client, slackId) {
   const user = slackId;
   const xoxd = process.env.ARCADIUS_SLACK_COOKIE;
 
-  slog(`Upgrading user ${user}`);
+  // slog(`Upgrading user ${user}`);
 
   try {
     await fetch("https://hackclub.slack.com/api/users.admin.setRegular", {
@@ -37,14 +37,14 @@ export async function upgradeUser(client, slackId) {
 
       if (r.ok) {
         metrics.timing("slack.upgradeUser.200", performance.now() - tsStart);
-        slog(`User ${user} upgraded`);
+        // slog(`User ${user} upgraded`);
       } else {
         metrics.timing("slack.upgradeUser.400", performance.now() - tsStart);
-        slog(`Error upgrading user ${user}`);
+        // slog(`Error upgrading user ${user}`);
       }
     });
   } catch (e) {
     logger(`Error upgrading user ${e}`, "error");
-    slog(`Error upgrading user ${e}`);
+    // slog(`Error upgrading user ${e}`);
   }
 }
