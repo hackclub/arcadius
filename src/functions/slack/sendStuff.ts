@@ -115,8 +115,8 @@ async function sendAlreadyVerifiedDM(userId) {
       {
         type: "section",
         text: {
-          type: "mrkdwn",
-          text: t("onboarding.step_three_copy_1", {}),
+          type: 'mrkdwn',
+          text: t('onboarding.step_three', {}),
         },
       },
     ],
@@ -134,8 +134,8 @@ async function sendFirstPurchaseSubmittedDM(userId) {
       {
         type: "section",
         text: {
-          type: "mrkdwn",
-          text: t("onboarding.step_three_copy_2", {}),
+          type: 'mrkdwn',
+          text: t('onboarding.step_three', {}),
         },
       },
     ],

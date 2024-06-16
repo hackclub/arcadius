@@ -23,25 +23,24 @@ onboarding:
     *type `/hack` and send it!!*
 
   shop_prompt: |-
-    INSERT AMAZING COPY HERE... run /shop to check out the shop!
-
-  step_three_copy_1: |-
-    Well done, well done!!
+    Good job with Step 2! When you earn minutes for real, there's one more step where you have to exchange those minutes for tickets. We can go over that later though… for now, here's 3 free tickets so you can skip to the good part.
 
     1. *Join the Slack ✓*
     2. *Hack on Projects ✓*
     3. *Get Cool Stuff* ← _You are here_
 
-    You can keep banking hours, or SHOP LINK? claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.
+    *To spend your tickets, run `/shop`*
 
-  step_three_copy_2: |-
-    You have arrived. Step 3 is complete, your prize is on its way :gift:
+  step_three: |-
+    You have _arrived._ Step 3 is complete, your prize is on its way :gift:
 
     1. *Join the Slack ✓*
-    2. *Hack on Projects ✓*
-    3. *Get Cool Stuff ✓*
+    2. *Hack on Projects ✓* (`/arcade`)
+    3. *Get Cool Stuff ✓* (`/shop`)
 
-    This is just the beginning. You have all summer to keep logging hours and claiming prizes! The Arcade closes on August 31st. Godspeed hacker, we can't wait to see what you build :heart:
+    This is just the beginning. You have all summer to keep logging hours and claiming prizes! The Arcade closes on August 31st.
+
+    And with that… you're ready to be a full member of Hack Club!
 
   accept_coc: |-
     Welcome to the Hack Club Arcade! :summer::joystick:
@@ -49,4 +48,4 @@ onboarding:
     Before we get started, we need to make sure you read and agree to the Hack Club Code of Conduct. You can read it here: <https://hackclub.com/conduct>. Once you've read it, type `/accept` to continue.
 
 test:
-  - "This is a test message"
+  - 'This is a test message'
