@@ -50,13 +50,6 @@ async function sendInitalDM(userId) {
 
 async function postRacoonInitalInstructions(payload) {
   metrics.increment("http.request.api_chat-postmessage");
-
-  // console.log(payload);
-
-  // console.log(conversation);
-
-  // send a axios request to POST https://slack.com/api/chat.postMessage
-
   let resp = await axios.post(
     "https://slack.com/api/chat.postMessage",
     {
@@ -69,10 +62,6 @@ async function postRacoonInitalInstructions(payload) {
       },
     }
   );
-
-  // edit the old message that included the button, to remove the button
-
-  // console.log(resp);
 }
 
 async function checkOutTheShop(userId) {
@@ -100,8 +89,6 @@ async function sendAlreadyVerifiedDM(userId) {
 
   let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
 
-  // get email from slack api
-  // FIXME: this should be a seperate function
   let email = await client.users.info({
     user: userId,
   });

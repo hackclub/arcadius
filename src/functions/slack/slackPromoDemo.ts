@@ -2,6 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { App } from "@slack/bolt";
+import { addToArcadeChannels } from "./addToArcadeChannels";
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN!,
@@ -26,7 +27,10 @@ export async function promoteSlackUser(userID) {
     method: "POST",
   })
     .then((r) => r.json())
-    .then((x) => console.log(x))
+    .then((x) => {
+      addToArcadeChannels(userID);
+      console.log(x);
+    })
     .catch((e) => console.log(e));
 }
 

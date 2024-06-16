@@ -61,9 +61,11 @@ async function inviteGuestToSlack({ email, channels }) {
 
 let channels = [
   "C06SBHMQU8G", // #arcade
+
+  // ADDED IN ADD FUNCTION, MAKE SURE THEY ARE ONLY IN ONE PLACE!
   // "C01504DCLVD", // #scrapbook
   // "C077TSWKER0", // #arcade-help
-  "C078CMYMW4R", // #arcade-lounge
+  // "C078CMYMW4R", // #arcade-lounge
 ];
 
 let csvChannels = channels.join(",");
