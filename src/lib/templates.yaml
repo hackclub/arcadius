@@ -48,5 +48,8 @@ onboarding:
 
     Before we get started, we need to make sure you read and agree to the Hack Club Code of Conduct. You can read it here: <https://hackclub.com/conduct>. Once you've read it, type `/accept` to continue.
 
+  paridise: |-
+    Welcome to paradise! :palm_tree: You've made it to the Hack Club Arcade! :summer::joystick:
+
 test:
   - "This is a test message"
