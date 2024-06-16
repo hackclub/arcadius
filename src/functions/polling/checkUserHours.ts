@@ -13,15 +13,23 @@ export async function checkUserHours() {
     return minutesAll > 0;
   });
 
-  let tmp = await getVerifiedUsers();
+  let usersWithAtLeastOneSession = USERS.filter((user) => {
+    // check where user[sessions] > 0
+    // check to see if sessions is not any empty array
+    if (user["Sessions"] === undefined) {
+    } else {
+      return user
+    }
 
+  });
+
+  let tmp = await getVerifiedUsers();
   // make an array of 'Hack Club Slack ID's
   let verifiedUsers = tmp.map((user) => user["Hack Club Slack ID"]);
 
   // check if the user has minimumHoursConfirmed === true
   // if not, send them a DM
-  if (usersWithMoreThanNoMinutes.length > 0) {
-    usersWithMoreThanNoMinutes.forEach(async (user) => {
+    usersWithAtLeastOneSession.forEach(async (user) => {
       if (user["verificationDmSent"] === true && user["isFullUser"] === true) {
         return;
       } else {
@@ -63,4 +71,3 @@ export async function checkUserHours() {
       }
     });
   }
-}

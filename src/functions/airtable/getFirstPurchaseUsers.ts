@@ -1,4 +1,4 @@
-import { verificationsAirtable } from "../../lib/airtable";
+import { hoursAirtable } from "../../lib/airtable";
 import metrics from "../../metrics";
 
 // Get all users that have just made their first purchase
@@ -8,9 +8,11 @@ export async function getFirstPurchaseUsers() {
   const tsStart = performance.now();
 
   // Return all users for which the Orders field has a length of 1, and the firstPurchaseSubmitted field is false
-  const data = await verificationsAirtable
+  const data = await hoursAirtable
     .select({
-      // filterByFormula: `AND(LEN({Orders}) = 1, NOT({firstPurchaseSubmitted}))`,
+      filterByFormula: `AND({Order Count} = 1, NOT({firstPurchaseSubmitted}))`,
+        // filterByFormula: `{Order Count} = 1`,
+
     })
     .all();
 

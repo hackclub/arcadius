@@ -87,8 +87,7 @@ anyway, Arcade?? try it try it!!
 }
 
 async function sendVerificationDM(client, userId) {
-
-  let dmChannel = await getDmChannelFromAirtable({slackId: userId});
+  let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
 
   metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
@@ -100,7 +99,8 @@ async function sendVerificationDM(client, userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `Congratulations on completing your first five hours! Before you can move on to Step 3, we do need you to complete that <https://hack.club/arcade-verify?prefill_Hack+Club+Slack+ID=${userId}&hide_Hack+Club+Slack+ID=true|age verification>. Once that's done, you'll be ready to go! \n\n If you have any questions, feel free to <mailto:arcade@hackclub.com | email us> or ask for help in <#C077TSWKER0>`,
+          // text: `INSERT AMAZING COPY HERE <https://hack.club/arcade-verify?prefill_Hack+Club+Slack+ID=${userId}&hide_Hack+Club+Slack+ID=true|age verification>. Once that's done, you'll be ready to go! \n\n If you have any questions, feel free to <mailto:arcade@hackclub.com | email us> or ask for help in <#C077TSWKER0>`,
+          text: `INSERT AMAZING COPY HERE... run /shop to check out the shop!`,
         },
       },
     ],
@@ -110,7 +110,14 @@ async function sendVerificationDM(client, userId) {
 async function sendAlreadyVerifiedDM(client, userId, internalID) {
   metrics.increment("http.request.api_chat-postmessage");
 
-  let dmChannel = await getDmChannelFromAirtable({slackId: userId});
+  let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
+
+  // get email from slack api
+  // FIXME: this should be a seperate function
+  let email = await client.users.info({
+    user: userId,
+  });
+  email = email.user.profile.email;
 
   await client.chat.postMessage({
     channel: dmChannel,
@@ -127,7 +134,7 @@ async function sendAlreadyVerifiedDM(client, userId, internalID) {
 2. *Hack on Projects ✓*
 3. *Get Cool Stuff* ← _You are here_
 
-You can keep banking hours, or <https:/hack.club/arcade-shop?slack_id=${userId}?internal_id=${internalID}|claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.`,
+You can keep banking hours, or <https:/hack.club/arcade-shop?slack_id=${userId}?internal_id=${internalID}?email${email}|claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.`,
         },
       },
       {
@@ -151,7 +158,9 @@ You can keep banking hours, or <https:/hack.club/arcade-shop?slack_id=${userId}?
 export async function sendFirstPurchaseSubmittedDM(client, userId) {
   metrics.increment("http.request.api_chat-postmessage");
 
-  let dmChannel = await getDmChannelFromAirtable({slackId: userId});
+  console.log("eyyyyy");
+  console.log(userId);
+  let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
   await client.chat.postMessage({
     channel: dmChannel,
@@ -177,5 +186,5 @@ export {
   postRacoonInitalInstructions,
   sendAlreadyVerifiedDM,
   sendInitalDM,
-  sendVerificationDM
+  sendVerificationDM,
 };

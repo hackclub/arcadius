@@ -12,23 +12,24 @@ import { getDmChannelEndpoint } from "./endpoints/getDmChannel";
 import { healthEndpoint } from "./endpoints/health";
 import { indexEndpoint } from "./endpoints/index";
 import { slackInviteEndpoint } from "./endpoints/slackInvite";
-import { createArcadeUser } from "./func/createArcadeUser";
+import { createArcadeUser } from "./functions/airtable/createArcadeUser";
 import { checkUserHours } from "./functions/polling/checkUserHours";
-import { jobCheckUsers } from "./functions/polling/jobCheckUsers";
 import { pollFirstPurchaseUsers } from "./functions/polling/pollFirstPurchaseUsers";
 import {
   postRacoonInitalInstructions,
   sendFirstPurchaseSubmittedDM,
   sendInitalDM,
 } from "./functions/sendStuff";
+import { upgradeSlackUser } from "./functions/upgradeSlackUser";
 import {
   hoursAirtable,
   ordersAirtable,
-  sessionsAirtable
+  sessionsAirtable,
 } from "./lib/airtable";
 import metrics from "./metrics";
 import { flowTriggeredByEnum } from "./types/flowTriggeredBy";
 import logger from "./util/Logger";
+import { protectAtAllCosts } from "./util/middlewear/auth";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -44,16 +45,25 @@ const app = new App({
 app.event(/.*/, async ({ event, client }) => {
   metrics.increment(`slack.event.${event.type}`);
   switch (event.type) {
-    // case "team_join":
-    //   const userInfo = await client.users.info({ user: event.user.id });
-    //   console.log(userInfo);
-    //   const email = userInfo.email;
-    //   const name = userInfo.real_name as string;
-    //   let flowTriggeredBy: flowTriggeredByType = "arcadius"
-    //   await createArcadeUser(event.user.id, email, name, flowTriggeredBy);
-    //   const channel = await sendInitalDM(client, event.user.id);
-
-    //   break;
+    case "team_join":
+      // check if username starts with test
+      // @ts-ignore
+      if (event.user.profile.guest_invited_by === "U078MRX71TJ") {
+        const userInfo = await client.users.info({ user: event.user.id });
+        // @ts-ignore
+        console.log(userInfo.user.profile);
+        // @ts-ignore
+        const email = userInfo.user.profile.email!;
+        // @ts-ignore
+        const name = userInfo.user.profile.real_name_normalized!;
+        console.log({ email, name });
+        let flowTriggeredBy: flowTriggeredByEnum = flowTriggeredByEnum.arcadius;
+        console.log({ flowTriggeredBy });
+        await createArcadeUser(event.user.id, email, name, flowTriggeredBy);
+        console.log(`Created arcade user for ${name} (${email})`);
+        const channel = await sendInitalDM(client, event.user.id);
+      }
+      break;
   }
 });
 
@@ -71,6 +81,7 @@ app.action(/.*?/, async (args) => {
     case "fake_it_final":
       metrics.increment("slack.action.fake_it_final");
       await sendFirstPurchaseSubmittedDM(client, user);
+      await upgradeSlackUser(client, user);
       break;
 
     case "summon_haccoon_initial":
@@ -90,38 +101,41 @@ receiver.router.use(express.json());
 receiver.router.get("/", indexEndpoint);
 receiver.router.get("/ping", healthEndpoint);
 receiver.router.get("/up", healthEndpoint);
-receiver.router.post("/slack-invite", slackInviteEndpoint);
-receiver.router.post("/existing-user-start", async (req, res) => {
-  // todo: AUTHENTICATE ME!
-const userId = req.body.userId;
-const user = (await client.users.info({ user: userId })).user;
-try {
+receiver.router.post("/slack-invite", protectAtAllCosts, slackInviteEndpoint);
+receiver.router.post(
+  "/existing-user-start",
+  protectAtAllCosts,
+  async (req, res) => {
+    const userId = req.body.userId;
+    console.log(`Creating arcade user for ${userId}`);
+    const user = (await client.users.info({ user: userId })).user;
+    try {
+      let triggeredBy: flowTriggeredByEnum = flowTriggeredByEnum.hedi;
 
-  let triggeredBy:flowTriggeredByEnum = flowTriggeredByEnum.hedi;
+      const arcadeUser = await createArcadeUser(
+        userId,
+        user.profile.email,
+        user.profile.real_name,
+        triggeredBy
+      );
+      const channel = await sendInitalDM(client, req.body.userId);
+      // @ts-ignore
+      let airtableRecId = arcadeUser.id;
 
-  const arcadeUser = await createArcadeUser(
-    userId,
-    user.profile.email,
-    user.profile.real_name,
-    triggeredBy
-  );
-  const channel = await sendInitalDM(client, req.body.userId);
-  // @ts-ignore
-  let airtableRecId = arcadeUser.id;
-
-  res.status(200).json({ channelId: channel, airtableRecId: airtableRecId});
-
-} catch (err) {
-  console.error(err);
-  res.json({});
-}
-});
+      res
+        .status(200)
+        .json({ channelId: channel, airtableRecId: airtableRecId });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "a fatal error occurred" });
+    }
+  }
+);
 receiver.router.post("/demo", (req) => {
   demo(req.body.userId);
   // upgradeSlackUser(client, "U077HDMHF8E");
 });
 receiver.router.get("/get-dm-channel", getDmChannelEndpoint);
-
 
 receiver.router.use(
   responseTime((req, res, time) => {
@@ -238,16 +252,16 @@ new CronJob(
   "America/New_York"
 );
 
-new CronJob(
-  "*/3 * * * * *",
-  async function () {
-    logger("Checking full users against arcade users.", "cron");
-    await jobCheckUsers();
-  },
-  null,
-  true,
-  "America/New_York"
-);
+// new CronJob(
+//   "*/3 * * * * *",
+//   async function () {
+//     logger("Checking full users against arcade users.", "cron");
+//     await jobCheckUsers();
+//   },
+//   null,
+//   true,
+//   "America/New_York"
+// );
 
 new CronJob(
   "*/5 * * * * *",
