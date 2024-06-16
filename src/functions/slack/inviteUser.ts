@@ -1,6 +1,6 @@
 import colors from "colors";
-import metrics from "../metrics";
-import logger, { slog } from "../util/Logger";
+import metrics from "../../metrics";
+import logger, { slog } from "../../util/Logger";
 
 async function inviteGuestToSlack({ email, channels }) {
   metrics.increment("http.request.api_users-admin-inviteGuestToSlack");

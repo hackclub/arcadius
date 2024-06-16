@@ -1,7 +1,7 @@
 import colors from "colors";
 import { hoursAirtable } from "../../lib/airtable";
 import { getFirstPurchaseUsers } from "../airtable/getFirstPurchaseUsers";
-import { sendFirstPurchaseSubmittedDM } from "../sendStuff";
+import { sendFirstPurchaseSubmittedDM } from "../slack/sendStuff";
 
 export async function pollFirstPurchaseUsers() {
   const users = await getFirstPurchaseUsers();

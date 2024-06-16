@@ -1,8 +1,8 @@
 import axios from "axios";
-import { client } from "../index";
-import { t } from "../lib/templates";
-import metrics from "../metrics";
-import { updateUserChannel } from "./airtable/updateUserChannel";
+import { client } from "../../index";
+import { t } from "../../lib/templates";
+import metrics from "../../metrics";
+import { updateUserChannel } from "../airtable/updateUserChannel";
 import { getDmChannelFromAirtable } from "./getDmChannelFromAirtable";
 
 const haccoonId = "U078FB76K5F";
@@ -61,12 +61,7 @@ async function postRacoonInitalInstructions(payload) {
     "https://slack.com/api/chat.postMessage",
     {
       channel: payload.value,
-      text: `_scurry scurry…_ oh hey wow, new frennd!! hey check out this neat piece of garbage i found, smells rul tasty right right??
-
-_…twitch…_
-
-anyway, Arcade?? try it try it!!
-*type \`/hack\` and send it!!*`,
+      text: t("onboarding.hedi_intro", {}),
     },
     {
       headers: {
@@ -80,7 +75,7 @@ anyway, Arcade?? try it try it!!
   // console.log(resp);
 }
 
-async function sendVerificationDM(userId) {
+async function checkOutTheShop(userId) {
   let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
 
   metrics.increment("http.request.api_chat-postmessage");
@@ -93,15 +88,14 @@ async function sendVerificationDM(userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          // text: `INSERT AMAZING COPY HERE <https://hack.club/arcade-verify?prefill_Hack+Club+Slack+ID=${userId}&hide_Hack+Club+Slack+ID=true|age verification>. Once that's done, you'll be ready to go! \n\n If you have any questions, feel free to <mailto:arcade@hackclub.com | email us> or ask for help in <#C077TSWKER0>`,
-          text: `INSERT AMAZING COPY HERE... run /shop to check out the shop!`,
+          text: t("onboarding.check_out_shop", {}),
         },
       },
     ],
   });
 }
 
-async function sendAlreadyVerifiedDM(userId, internalID) {
+async function sendAlreadyVerifiedDM(userId) {
   metrics.increment("http.request.api_chat-postmessage");
 
   let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
@@ -122,13 +116,7 @@ async function sendAlreadyVerifiedDM(userId, internalID) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `Well done, well done!!
-
-1. *Join the Slack ✓*
-2. *Hack on Projects ✓*
-3. *Get Cool Stuff* ← _You are here_
-
-You can keep banking hours, or <https:/hack.club/arcade-shop?slack_id=${userId}?internal_id=${internalID}?email${email}|claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.`,
+          text: t("onboarding.step_three_copy_1", {}),
         },
       },
     ],
@@ -147,13 +135,7 @@ async function sendFirstPurchaseSubmittedDM(userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `You have arrived. Step 3 is complete, your prize is on its way :gift:
-
-1. *Join the Slack ✓*
-2. *Hack on Projects ✓*
-3. *Get Cool Stuff ✓*
-
-This is just the beginning. You have all summer to keep logging hours and claiming prizes! The Arcade closes on August 31st. Godspeed hacker, we can't wait to see what you build :heart:`,
+          text: t("onboarding.step_three_copy_2", {}),
         },
       },
     ],
@@ -172,7 +154,7 @@ async function sendUpgradedDM(userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: `You have been upgraded to a full user! :tada:`,
+          text: t("onboarding.accept_coc", {}),
         },
       },
       {
@@ -195,10 +177,10 @@ async function sendUpgradedDM(userId) {
 }
 
 export {
+  checkOutTheShop,
   postRacoonInitalInstructions,
   sendAlreadyVerifiedDM,
   sendFirstPurchaseSubmittedDM,
   sendInitalDM,
   sendUpgradedDM,
-  sendVerificationDM,
 };

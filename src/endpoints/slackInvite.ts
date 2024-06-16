@@ -1,4 +1,4 @@
-import { inviteSlackUser } from "../functions/inviteUser";
+import { inviteSlackUser } from "../functions/slack/inviteUser";
 import logger from "../util/Logger";
 
 export async function slackInviteEndpoint(req, res) {

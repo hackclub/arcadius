@@ -2,7 +2,7 @@ import { hoursAirtable } from "../../lib/airtable";
 import logger from "../../util/Logger";
 import { getHoursUsers } from "../airtable/getHoursUsers";
 import { getVerifiedUsers } from "../airtable/getVerifiedUsers";
-import { sendAlreadyVerifiedDM, sendVerificationDM } from "../sendStuff";
+import { sendAlreadyVerifiedDM } from "../slack/sendStuff";
 
 export async function checkUserHours() {
   let USERS = await getHoursUsers();
@@ -38,14 +38,11 @@ export async function checkUserHours() {
             verifiedUsers.includes(user["Slack ID"]) &&
             user["verificationDmSent"]
           ) {
-            await sendAlreadyVerifiedDM(
-              user["Slack ID"],
-              user["Internal ID"]
-            ).then(() => {
+            await sendAlreadyVerifiedDM(user["Slack ID"]).then(() => {
               // upgradeSlackUser(client, user["Slack ID"]);
             });
           } else {
-            await sendVerificationDM(user["Slack ID"]);
+            await sendAlreadyVerifiedDM(user["Slack ID"]);
           }
 
           try {

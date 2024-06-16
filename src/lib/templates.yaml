@@ -14,5 +14,39 @@ onboarding:
     Hack Club is a rather _big_ place, this Arcade is just one little piece of it. I would show you around, but these old dinosaur bones don’t move like they used to…
 
     My dear friend <@U078FB76K5F> can give you a tour though!
+  hedi_intro: |-
+    _scurry scurry…_ oh hey wow, new frennd!! hey check out this neat piece of garbage i found, smells rul tasty right right??
+
+    _…twitch…_
+
+    anyway, Arcade?? try it try it!!
+    *type `/hack` and send it!!*
+
+  shop_prompt: |-
+    INSERT AMAZING COPY HERE... run /shop to check out the shop!
+
+  step_three_copy_1: |-
+    Well done, well done!!
+
+    1. *Join the Slack ✓*
+    2. *Hack on Projects ✓*
+    3. *Get Cool Stuff* ← _You are here_
+
+    You can keep banking hours, or SHOP LINK? claim your first arcade prize>! We've also added you to the rest of the slack. It can be a bit overwhelming at first, but some of the channels <https://hackclub.slack.com/canvas/C01AS1YEM8A|here> might help you get oriented.
+
+  step_three_copy_2: |-
+    You have arrived. Step 3 is complete, your prize is on its way :gift:
+
+    1. *Join the Slack ✓*
+    2. *Hack on Projects ✓*
+    3. *Get Cool Stuff ✓*
+
+    This is just the beginning. You have all summer to keep logging hours and claiming prizes! The Arcade closes on August 31st. Godspeed hacker, we can't wait to see what you build :heart:
+
+  accept_coc: |-
+    Welcome to the Hack Club Arcade! :summer::joystick:
+
+    Before we get started, we need to make sure you read and agree to the Hack Club Code of Conduct. You can read it here: <https://hackclub.com/conduct>. Once you've read it, type `/accept` to continue.
+
 test:
   - "This is a test message"

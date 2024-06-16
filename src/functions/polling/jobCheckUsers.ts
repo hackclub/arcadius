@@ -1,7 +1,7 @@
 import { hoursAirtable } from "../../lib/airtable";
 import logger from "../../util/Logger";
 import { getHoursUsers } from "../airtable/getHoursUsers";
-import { fetchUsers } from "../jankySlackCrap";
+import { fetchUsers } from "../slack/fetchSlackUsers";
 
 export async function jobCheckUsers() {
   let pUsers = await getHoursUsers();

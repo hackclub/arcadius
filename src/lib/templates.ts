@@ -1,7 +1,14 @@
 import fs from "fs";
 import { parse } from "yaml";
 
-type template = "app.startup" | "onboarding.welcome_hacker";
+type template =
+  | "app.startup"
+  | "onboarding.welcome_hacker"
+  | "onboarding.hedi_intro"
+  | "onboarding.check_out_shop"
+  | "onboarding.step_three_copy_2"
+  | "onboarding.step_three_copy_1"
+  | "onboarding.accept_coc";
 
 interface data {
   slackId?: string;

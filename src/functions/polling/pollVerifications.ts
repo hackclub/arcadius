@@ -1,5 +1,5 @@
 import { hoursAirtable } from "../../lib/airtable";
-import { sendUpgradedDM } from "../sendStuff";
+import { sendUpgradedDM } from "../slack/sendStuff";
 
 export async function pollVerifications() {
   const data = await hoursAirtable

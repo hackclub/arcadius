@@ -16,12 +16,12 @@ import { createArcadeUser } from "./functions/airtable/createArcadeUser";
 import { checkUserHours } from "./functions/polling/checkUserHours";
 import { pollFirstPurchaseUsers } from "./functions/polling/pollFirstPurchaseUsers";
 import { pollVerifications } from "./functions/polling/pollVerifications";
-import { removeOldHakoonButton } from "./functions/removeOldHakoonButton";
+import { removeOldHakoonButton } from "./functions/slack/removeOldButtons";
 import {
   postRacoonInitalInstructions,
   sendInitalDM,
-} from "./functions/sendStuff";
-import { demoteSlackUser, promoteSlackUser } from "./functions/slackPromoDemo";
+} from "./functions/slack/sendStuff";
+import { promoteSlackUser } from "./functions/slack/slackPromoDemo";
 import { t } from "./lib/templates";
 import metrics from "./metrics";
 import { flowTriggeredByEnum } from "./types/flowTriggeredBy";
@@ -127,10 +127,22 @@ receiver.router.post(
     }
   }
 );
-receiver.router.post("/demo", protectAtAllCosts, (req) => {
-  demoteSlackUser(req.body.userId);
-});
-receiver.router.get("/get-dm-channel", getDmChannelEndpoint);
+// receiver.router.post("/demo", protectAtAllCosts, (req, res) => {
+//   // demoteSlackUser(req.body.userId);
+
+//   console.log(req.body.userId);
+//   let userId = req.body.userId;
+//   // set tmp to be the user id where we replace the first letter with a "D"
+//   let tmp = userId.replace(userId.charAt(0), "D");
+
+//   app.client.chat.postMessage({
+//     channel: userId,
+//     text: "This is a test message",
+//   });
+
+//   res.status(200).json({ message: "ok" });
+// });
+receiver.router.get("/get-dm-channel", protectAtAllCosts, getDmChannelEndpoint);
 
 receiver.router.use(
   responseTime((req, res, time) => {
