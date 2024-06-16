@@ -15,20 +15,17 @@ import { slackInviteEndpoint } from "./endpoints/slackInvite";
 import { createArcadeUser } from "./functions/airtable/createArcadeUser";
 import { checkUserHours } from "./functions/polling/checkUserHours";
 import { pollFirstPurchaseUsers } from "./functions/polling/pollFirstPurchaseUsers";
+import { pollVerifications } from "./functions/polling/pollVerifications";
+import { removeOldHakoonButton } from "./functions/removeOldHakoonButton";
 import {
   postRacoonInitalInstructions,
-  sendFirstPurchaseSubmittedDM,
   sendInitalDM,
 } from "./functions/sendStuff";
-import { upgradeSlackUser } from "./functions/upgradeSlackUser";
-import {
-  hoursAirtable,
-  ordersAirtable,
-  sessionsAirtable,
-} from "./lib/airtable";
+import { demoteSlackUser, promoteSlackUser } from "./functions/slackPromoDemo";
+import { t } from "./lib/templates";
 import metrics from "./metrics";
 import { flowTriggeredByEnum } from "./types/flowTriggeredBy";
-import logger from "./util/Logger";
+import logger, { slog } from "./util/Logger";
 import { protectAtAllCosts } from "./util/middlewear/auth";
 
 const receiver = new ExpressReceiver({
@@ -61,7 +58,7 @@ app.event(/.*/, async ({ event, client }) => {
         console.log({ flowTriggeredBy });
         await createArcadeUser(event.user.id, email, name, flowTriggeredBy);
         console.log(`Created arcade user for ${name} (${email})`);
-        const channel = await sendInitalDM(client, event.user.id);
+        const channel = await sendInitalDM(event.user.id);
       }
       break;
   }
@@ -78,15 +75,14 @@ app.action(/.*?/, async (args) => {
 
   // @ts-ignore
   switch (payload.action_id) {
-    case "fake_it_final":
-      metrics.increment("slack.action.fake_it_final");
-      await sendFirstPurchaseSubmittedDM(client, user);
-      await upgradeSlackUser(client, user);
-      break;
-
     case "summon_haccoon_initial":
       metrics.increment("slack.action.summon_haccoon_initial");
+      await removeOldHakoonButton(body);
       await postRacoonInitalInstructions(payload);
+      break;
+    case "accept_coc":
+      metrics.increment("slack.action.accept_coc");
+      await promoteSlackUser(user);
       break;
   }
 });
@@ -118,7 +114,7 @@ receiver.router.post(
         user.profile.real_name,
         triggeredBy
       );
-      const channel = await sendInitalDM(client, req.body.userId);
+      const channel = await sendInitalDM(req.body.userId);
       // @ts-ignore
       let airtableRecId = arcadeUser.id;
 
@@ -131,9 +127,8 @@ receiver.router.post(
     }
   }
 );
-receiver.router.post("/demo", (req) => {
-  demo(req.body.userId);
-  // upgradeSlackUser(client, "U077HDMHF8E");
+receiver.router.post("/demo", protectAtAllCosts, (req) => {
+  demoteSlackUser(req.body.userId);
 });
 receiver.router.get("/get-dm-channel", getDmChannelEndpoint);
 
@@ -182,57 +177,9 @@ axios.interceptors.response.use((res: any) => {
 });
 
 const logStartup = async (app: App) => {
-  await app.client.chat.postMessage({
-    // LOG_CHANNEL= "C077F5AVB38", # Prod Logging
-    // LOG_CHANNEL= "C069N64PW4A", # secret testing of secret things
-    channel: "C069N64PW4A",
-    text: `I AM ALIVE! :heart-eng: :robot_face: \n\n What'da know? I'm running in the env *${process.env.NODE_ENV}*! :tada:`,
-  });
+  let env = process.env.NODE_ENV;
+  slog(t("app.startup", { environment: env }), "info");
 };
-
-async function demo(userId: string) {
-  console.log(`Demoing ${userId}`);
-  try {
-    const userRecord = (
-      await hoursAirtable
-        .select({ filterByFormula: `{Slack ID} = '${userId}'` })
-        .all()
-    ).at(0);
-
-    if (userRecord) {
-      const fields = userRecord.fields;
-      console.log(`Running a demo for ${fields.Name} (${userId})`);
-      // console.log(`Running a demo for ${fields.Name} (${userId})`, fields);
-
-      const sessionIds = fields["Sessions"] as Array<string>;
-      if (sessionIds) {
-        console.log(`Destroying ${sessionIds.length} sessions`);
-        await sessionsAirtable.destroy(sessionIds);
-      }
-
-      const orderIds = fields["Orders"] as Array<string>;
-      if (orderIds) {
-        console.log(`Destroying ${orderIds.length} orders`);
-        await ordersAirtable.destroy(orderIds);
-      }
-
-      await hoursAirtable.update(userRecord.id, {
-        verificationDmSent: false,
-        minimumHoursSubmitted: false,
-        minimumHoursConfirmed: false,
-        verificationConfirmed: false,
-        isFullUser: false,
-        firstPurchaseSubmitted: false,
-      });
-
-      sendInitalDM(client, userId);
-    } else {
-      logger(`No existing arcade record for slack ID ${userId}`, "error");
-    }
-  } catch (err) {
-    logger(`Error running demo for ${userId}: ${err}`, "error");
-  }
-}
 
 app.start(process.env.PORT || 3000).then(async () => {
   await logStartup(app);
@@ -292,6 +239,17 @@ new CronJob(
   async function () {
     logger("Polling for first purchase users.", "cron");
     await pollFirstPurchaseUsers();
+  }, // onTick
+  null, // onComplete
+  true, // start
+  "America/New_York" // timeZone
+);
+
+new CronJob(
+  "*/4 * * * * *",
+  async function () {
+    logger("Polling for verified users.", "cron");
+    await pollVerifications();
   }, // onTick
   null, // onComplete
   true, // start

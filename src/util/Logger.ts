@@ -13,7 +13,7 @@ async function slog(logMessage, type: LogType) {
   } else {
     await client.chat.postMessage({
       channel: "C069N64PW4A",
-      text: `:warning: *TESTING* :warning: ${logMessage}`,
+      text: `${logMessage}`,
     });
   }
 }

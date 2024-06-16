@@ -1,130 +1,18 @@
-update:
-    - heads up <@${slackId}>! you only have `${minutes}` minutes remaining!
-    - time's ticking <@${slackId}>, looks like you have `${minutes}` minutes left!
-    - you have `${minutes}` minutes left <@${slackId}>! keep it up!
-    - almost there <@${slackId}>, `${minutes}` minutes left! take a coffee break while you're at it!
-    - power through <@${slackId}>! you have `${minutes}` minutes left!
-    - you're amazing <@${slackId}>! only `${minutes}` minutes left!
-    - impressive work! just `${minutes}` minutes left <@${slackId}>!
-
-hack:
-    - tick tock i'm a clock
-
-complete:
-    - WOOOOO! YOU DID IT <@${slackId}>!
-    - guess what? <@${slackId}> finished their hour!
-    - <@${slackId}>'s pretty wizard! they finished their hour!
-    - epic job <@${slackId}>, you're done!
-    - pretty wizard <@${slackId}>! you finished your hour!
-    - have a nice break <@${slackId}>! you finished your hour!
-    - excellent work <@${slackId}>! :D
-    - "amazing work <@${slackId}>! C:"
-    - you're a rockstar <@${slackId}>! you finished!
-    - legendary <@${slackId}>! you're done!
-    - you're an epic wizard <@${slackId}>! awesome job magicking epic stuff up!
-
-cancel:
-    - <@${slackId}> ended their hack hour early!
-    - <@${slackId}> finished their hack hour early.
-    - it looks like <@${slackId}> is already done!
-#    - ">I tell you, we are here on Earth to fart around,\n>and don't let anybody tell you different.\n_-- Kurt Vonnegut_"
-
-pause:
-    - <@${slackId}> is taking five!
-    - <@${slackId}> is catching a break!
-    - <@${slackId}> is drinking some coffee!
-
-encouragement:
-    - "You have `${minutes}` minutes remaining! Keep it up!"
-    - "You have `${minutes}` minutes remaining! You're doing great!"
-    - "You have `${minutes}` minutes remaining! You've got this!"
-    - "You have `${minutes}` minutes remaining! You are ducktastic!"
-    - "You have `${minutes}` minutes remaining! Wizard!"
-
-toplevel:
-    - "it looks like <@${slackId}> is getting more power this hour! `${minutes}` minutes remaining to work on:"
-    - "<@${slackId}> is keeping the doctor away with this hack hour! `${minutes}` minutes remaining to work on:"
-    - "let's go! <@${slackId}> has `${minutes}` minutes to work on:"
-
-init:
-    - "tick tock tick tock, it looks like <${repo}|I'm> the clock! <#${main}>"
-    - "watching time is a daunting task. but <${repo}|I'm> up for the task! <#${main}>"
-    - "new formula, same great taste! <#${main}>"
-    - "every hour more power...<#${main}>"
-    - "if scrapbook is the past and ship is the future, then <${repo}|I> am the present...<#${main}>"
-    - "watching for new hours in <#${main}>"
-    - "no, I am not hack minute. <${repo}|I am> <#${main}>!"
-    - "I am the hour. or more aptly, <${repo}|the hour is me>...<#${main}>"
-    - "time travelling in <#${main}> like there's no tomorrow!"
-    - "perhaps time would make all the wishes in <#C07443MC9UP> come true...<#${main}>"
-
-welcome:
-    - "welcome to hack hour, <@${slackId}>! :wave:"
+app:
+  startup:
+    - "What'da know? I AM ALIVE! :heart-eng: :robot_face: and running in the env *${environment}*! :tada:"
+    - whoa! hey there! im functional ig... check me out in the env *${environment}*!
 
 onboarding:
-    new_face:
-        - "looks like you're new around here :eyes:"
+  welcome_hacker: |-
+    Welcome hacker, it’s so good to see you! You know what this means, right? You’ve made it to Step 2 of the Hack Club Arcade! :summer::joystick:
 
-    encouragement:
-        - "You have `${minutes}` minutes remaining! Onboarding text goes here!"
-#        - "aaaaa"
-        - "hey friend! welcome to the arcade! as you can see there are a lot of button to click, so click away"
+    1. *Join the Slack ✓*
+    2. *Hack on Projects* ← _You are here_
+    3. Get Cool Stuff
 
-    init:
-        - "check out all this <https://hack.club.com/arcade-shop|cool trash> I just found! I’ll give you some scraps once you’re through your project"
+    Hack Club is a rather _big_ place, this Arcade is just one little piece of it. I would show you around, but these old dinosaur bones don’t move like they used to…
 
-    update:
-        - nice work <@${slackId}>! `${minutes}` min down- nice work! let’s keep going. make sure to post a screenshot of your progress or a commit link.
-
-    complete:
-        - great work <@${slackId}>! you've got a hack hour! this hour is still unreviewed, but keep on hacking to get more hours!
-
-    evidence_reminder:
-        - hey! remember to document your journey! you need post a git commit or a photo of what you're working on!
-
-error:
-    #context: attempting to start a new session while already in one
-    already_hacking:
-        - hey! you're already in a hack hour session! you can't start another one until you finish the one you're in!
-
-    not_hacking:
-        - hmph, whatcha doin? want some garbage? run `/hack`!
-
-    empty_text:
-        - you need to provide something to work on!
-
-    cancel:
-        - hey! are ya tryin to pull some funny business?
-
-    not_a_user:
-        - who are ya? never seen you before - maybe run `/hack` so we can get to know each other!
-
-    not_yours:
-        - hands to yourself buddy
-
-    generic:
-        - something went wrong! try again!
-
-    #context: trying to resume a session that hasn't been paused
-    already_resumed:
-        - you've already started your hack hour! keep going! and `/pause` if ya need a break1
-
-action:
-    paused:
-        - i paused the clock for ya. you still got `${minutes}` minutes left
-
-    resumed:
-        - ready? you have `${minutes}` minutes left!
-
-detect:
-    activity:
-        - remember that you need to provide a git commit or a photo!
-
-    evidence:
-        - thanks for documenting your journey!!! :D
-
-airtable:
-    approved:
-        - great work <@${slackId}>! you've got a hack hour! this hour is now approved!
-    rejected:
-        - womp womp <@${slackId}>! this hour is now rejected! i wunder why
+    My dear friend <@U078FB76K5F> can give you a tour though!
+test:
+  - "This is a test message"

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "test-slack": "nodemon src/promote-test.js"
   },
   "dependencies": {
     "@slack/bolt": "^3.18.0",
@@ -18,8 +19,9 @@
     "cron": "^3.1.7",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "form-data": "^4.0.0",
     "js-yaml": "^4.1.0",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "2",
     "node-statsd": "^0.1.1",
     "nodemon": "^3.0.3",
     "postgres": "^3.4.4",

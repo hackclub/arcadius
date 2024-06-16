@@ -60,10 +60,10 @@ async function inviteGuestToSlack({ email, channels }) {
 }
 
 let channels = [
-  "C01504DCLVD", // #scrapbook
-  "C077TSWKER0", // #arcade-help
-  "C06SBHMQU8G", // #hack-hour
-  // "C078CMYMW4R", // #arcade-lounge
+  "C06SBHMQU8G", // #arcade
+  // "C01504DCLVD", // #scrapbook
+  // "C077TSWKER0", // #arcade-help
+  "C078CMYMW4R", // #arcade-lounge
 ];
 
 let csvChannels = channels.join(",");

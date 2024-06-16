@@ -1,10 +1,8 @@
-import { app, client } from "../../index";
 import { hoursAirtable } from "../../lib/airtable";
 import logger from "../../util/Logger";
 import { getHoursUsers } from "../airtable/getHoursUsers";
 import { getVerifiedUsers } from "../airtable/getVerifiedUsers";
 import { sendAlreadyVerifiedDM, sendVerificationDM } from "../sendStuff";
-import { upgradeSlackUser } from "../upgradeSlackUser";
 
 export async function checkUserHours() {
   let USERS = await getHoursUsers();
@@ -18,9 +16,8 @@ export async function checkUserHours() {
     // check to see if sessions is not any empty array
     if (user["Sessions"] === undefined) {
     } else {
-      return user
+      return user;
     }
-
   });
 
   let tmp = await getVerifiedUsers();
@@ -29,45 +26,46 @@ export async function checkUserHours() {
 
   // check if the user has minimumHoursConfirmed === true
   // if not, send them a DM
-    usersWithAtLeastOneSession.forEach(async (user) => {
-      if (user["verificationDmSent"] === true && user["isFullUser"] === true) {
+  usersWithAtLeastOneSession.forEach(async (user) => {
+    if (user["verificationDmSent"] === true && user["isFullUser"] === true) {
+      return;
+    } else {
+      if (user["isFullUser"] === true) {
         return;
       } else {
-        if (user["isFullUser"] === true) {
-          return;
-        } else {
-          if (user["verificationDmSent"] !== true) {
-            if (verifiedUsers.includes(user["Slack ID"]) &&
-              user["verificationDmSent"]) {
-              await sendAlreadyVerifiedDM(
-                app.client,
-                user["Slack ID"],
-                user["Internal ID"]
-              ).then(() => {
-                upgradeSlackUser(client, user["Slack ID"]);
-              });
-            } else {
-              await sendVerificationDM(app.client, user["Slack ID"]);
-            }
-
-            try {
-              const userRec = await hoursAirtable
-                .select({
-                  filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
-                  pageSize: 1,
-                })
-                .firstPage();
-
-              await hoursAirtable.update(userRec[0].id, {
-                verificationDmSent: true,
-              });
-            } catch (err) {
-              logger(`Error updating user: ${err}`, "error");
-            }
+        if (user["verificationDmSent"] !== true) {
+          if (
+            verifiedUsers.includes(user["Slack ID"]) &&
+            user["verificationDmSent"]
+          ) {
+            await sendAlreadyVerifiedDM(
+              user["Slack ID"],
+              user["Internal ID"]
+            ).then(() => {
+              // upgradeSlackUser(client, user["Slack ID"]);
+            });
           } else {
-            return;
+            await sendVerificationDM(user["Slack ID"]);
           }
+
+          try {
+            const userRec = await hoursAirtable
+              .select({
+                filterByFormula: `{Slack ID} = '${user["Slack ID"]}'`,
+                pageSize: 1,
+              })
+              .firstPage();
+
+            await hoursAirtable.update(userRec[0].id, {
+              verificationDmSent: true,
+            });
+          } catch (err) {
+            logger(`Error updating user: ${err}`, "error");
+          }
+        } else {
+          return;
         }
       }
-    });
-  }
+    }
+  });
+}
