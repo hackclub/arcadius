@@ -33,7 +33,7 @@ async function slog(logMessage, type) {
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": `> ${logMessage}`
+            "text": logMessage.split("\n").map(a => `> ${a}`).join("\n")
           }
         },
         {
