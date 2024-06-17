@@ -4,7 +4,7 @@ import { blog } from "../../util/Logger";
 
 export async function getHoursUsers() {
     try {
-        metrics.increment("airtable.get_hoursusers");
+        metrics.increment("airtable.get_hoursusers.200");
         const tsStart = performance.now();
 
         blog("Getting all users from the hours table", "info");

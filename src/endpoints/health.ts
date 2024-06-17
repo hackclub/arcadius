@@ -5,7 +5,7 @@ import { blog } from "../util/Logger";
 export async function healthEndpoint(req: Request, res: Response) {
   try {
     blog("Health check Hit", "info");
-    metrics.increment("health.endpoint.hit");
+    metrics.increment("health.hit");
 
     if (req.path === "/up") {
       metrics.increment("health.up");

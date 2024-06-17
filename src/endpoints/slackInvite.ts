@@ -5,7 +5,7 @@ import { blog } from "../util/Logger";
 export async function slackInviteEndpoint(req, res) {
   // this endpoint is hit by the form on hackclub.com/arcade
   try {
-    metrics.increment("slackInviteEndpoint");
+    metrics.increment("slack.slackInviteEndpoint");
     const email = req!.body!.email;
 
     blog(`slackInviteEndpoint: email: ${email}`, "info");

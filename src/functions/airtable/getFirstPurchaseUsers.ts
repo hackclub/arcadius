@@ -6,7 +6,7 @@ import { blog } from "../../util/Logger";
 
 export async function getFirstPurchaseUsers() {
     try {
-        metrics.increment("airtable.get_firstpurchaseusers");
+        metrics.increment("airtable.get_firstpurchaseusers.200");
         const tsStart = performance.now();
 
         blog(

@@ -3,7 +3,7 @@ import metrics from "../metrics";
 import { blog } from "../util/Logger";
 
 export async function indexEndpoint(req: Request, res: Response) {
-  metrics.increment("indexEndpoint");
+  metrics.increment("arcade.indexEndpoint");
   blog("Index Endpoint Hit", "info");
   try {
     res.redirect("https://github.com/hackclub/arcadius");
