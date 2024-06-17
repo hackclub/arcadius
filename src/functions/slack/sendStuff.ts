@@ -175,7 +175,11 @@ async function sendUpgradedDM(userId) {
       userRecord[0].get("Flow Triggered By") === flowTriggeredByEnum.hedi;
 
     // @ts-ignore
-    console.log("preexisting", preexisting, userRecord.fields);
+    // console.log("preexisting", preexisting, userRecord.fields);
+    blog(
+      `CHRISSSSSS preexisting: ${preexisting}, \n ${userRecord.fields!}`,
+      "info"
+    );
 
     if (!preexisting) {
       await client.chat.postMessage({
