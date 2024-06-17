@@ -13,10 +13,10 @@ import { healthEndpoint } from "./endpoints/health";
 import { indexEndpoint } from "./endpoints/index";
 import { slackInviteEndpoint } from "./endpoints/slackInvite";
 import { createArcadeUser } from "./functions/airtable/createArcadeUser";
+import { getDmChannelFromAirtable } from "./functions/airtable/getDmChannelFromAirtable";
 import { checkUserHours } from "./functions/polling/checkUserHours";
 import { pollFirstPurchaseUsers } from "./functions/polling/pollFirstPurchaseUsers";
 import { pollVerifications } from "./functions/polling/pollVerifications";
-import { getDmChannelFromAirtable } from "./functions/slack/getDmChannelFromAirtable";
 import { removeOldHakoonButton } from "./functions/slack/removeOldButtons";
 import {
   postRacoonInitalInstructions,
@@ -130,7 +130,7 @@ receiver.router.post(
       console.log(`Creating arcade user for ${userId}`);
       const user = (await client.users.info({ user: userId })).user;
       try {
-        let triggeredBy: flowTriggeredByEnum = flowTriggeredByEnum.arcadius;
+        let triggeredBy: flowTriggeredByEnum = flowTriggeredByEnum.hedi;
 
         const arcadeUser = await createArcadeUser(
           userId,

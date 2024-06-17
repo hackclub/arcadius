@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { getDmChannelFromAirtable } from "../functions/slack/getDmChannelFromAirtable";
+import { getDmChannelFromAirtable } from "../functions/airtable/getDmChannelFromAirtable";
 import metrics from "../metrics";
 import { blog } from "../util/Logger";
 

@@ -17,9 +17,15 @@ dependencies:
   airtable:
     specifier: ^0.12.2
     version: 0.12.2
+  async:
+    specifier: ^3.2.5
+    version: 3.2.5
   axios:
     specifier: ^1.7.2
     version: 1.7.2
+  bottleneck:
+    specifier: ^2.19.5
+    version: 2.19.5
   colors:
     specifier: ^1.4.0
     version: 1.4.0
@@ -61,6 +67,9 @@ dependencies:
     version: 2.4.5
 
 devDependencies:
+  '@types/async':
+    specifier: ^3.2.24
+    version: 3.2.24
   '@types/js-yaml':
     specifier: ^4.0.9
     version: 4.0.9
@@ -440,6 +449,10 @@ packages:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
 
+  /@types/async@3.2.24:
+    resolution: {integrity: sha512-8iHVLHsCCOBKjCF2KwFe0p9Z3rfM9mL+sSP8btyR5vTjJRAqpBYD28/ZLgXPf0pjG1VxOvtCV/BgXkQbpSe8Hw==}
+    dev: true
+
   /@types/body-parser@1.19.5:
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
     dependencies:
@@ -649,6 +662,10 @@ packages:
       is-shared-array-buffer: 1.0.3
     dev: false
 
+  /async@3.2.5:
+    resolution: {integrity: sha512-baNZyqaaLhyLVKm/DlvdW051MSgO6b8eVfIezl9E5PqWxFgzLm/wQntEW4zOytVburDEr0JlALEpdOFwvErLsg==}
+    dev: false
+
   /asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
     dev: false
@@ -697,6 +714,10 @@ packages:
       unpipe: 1.0.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /bottleneck@2.19.5:
+    resolution: {integrity: sha512-VHiNCbI1lKdl44tGrhNfU3lup0Tj/ZBMJB5/2ZbNXRCPuRCO7ed2mgcK4r17y+KB2EfuYuRaVlwNbAeaWGSpbw==}
     dev: false
 
   /brace-expansion@1.1.11:

@@ -1,21 +1,40 @@
 import * as dotenv from "dotenv";
-import { client } from "../index";
 dotenv.config();
 
+import { client } from "../index";
+
+import async from "async";
+import Bottleneck from "bottleneck";
 import colors from "colors";
 
-async function slog(logMessage, type: LogType) {
-  if (process.env.NODE_ENV === "production") {
-    await client.chat.postMessage({
-      channel: "C077F5AVB38",
-      text: logMessage,
-    });
-  } else {
-    await client.chat.postMessage({
-      channel: "C069N64PW4A",
-      text: `${logMessage}`,
-    });
+// Create a rate limiter with Bottleneck
+const limiter = new Bottleneck({
+  minTime: 1000, // 1 second between each request
+});
+
+const messageQueue = async.queue(async (task, callback) => {
+  try {
+    await limiter.schedule(() => client.chat.postMessage(task));
+    callback();
+  } catch (error) {
+    console.error("Error posting message:", error);
+    // @ts-ignore
+    callback(error);
   }
+}, 1); // Only one worker to ensure order and rate limit
+
+async function slog(logMessage, type) {
+  const message = {
+    channel:
+      process.env.NODE_ENV === "production" ? "C077F5AVB38" : "C069N64PW4A",
+    text: logMessage,
+  };
+
+  messageQueue.push(message, (error) => {
+    if (error) {
+      console.error("Failed to send message:", error);
+    }
+  });
 }
 
 type LogType = "info" | "start" | "cron" | "error";
