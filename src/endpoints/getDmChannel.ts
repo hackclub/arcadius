@@ -5,7 +5,7 @@ import { blog } from "../util/Logger";
 
 export async function getDmChannelEndpoint(req: Request, res: Response) {
   try {
-    metrics.increment("getDmChannelEndpoint");
+    metrics.increment("slack.getDmChannelEndpoint");
     const userId = req.query.userId;
 
     const tsStart = Date.now();
@@ -20,7 +20,7 @@ export async function getDmChannelEndpoint(req: Request, res: Response) {
       let dmChannel = await getDmChannelFromAirtable({
         slackId: userId as string,
       });
-      metrics.timing("getDmChannelEndpoint", Date.now() - tsStart);
+      metrics.timing("slack.getDmChannelEndpoint", Date.now() - tsStart);
       blog(`getDmChannelEndpoint: success`, "info");
       return res.status(200).json({ dmChannel });
     }

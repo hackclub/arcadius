@@ -7,7 +7,7 @@ export const fetchUsers = async (email) => {
 
     const cookieValue = `d=${process.env.JM_SLACK_COOKIE}`;
 
-    metrics.increment("http.request.api_users-admin-fetchTeamUsers");
+    metrics.increment("http.request.api_users-admin-fetchTeamUsers.200");
     const startTs = performance.now();
 
     const a = await fetch(
@@ -37,12 +37,12 @@ export const fetchUsers = async (email) => {
     const response = await a.json();
 
     metrics.timing(
-      "http.requests.api_users-admin-fetchTeamUsers.200",
+      "http.request.api_users-admin-fetchTeamUsers",
       performance.now() - startTs
     );
     return response.items?.[0]?.email;
   } catch (error) {
-    metrics.increment("http.requests.api_users-admin-fetchTeamUsers.error");
+    metrics.increment("http.request.api_users-admin-fetchTeamUsers.500");
     blog(`Error in fetchUsers: ${error}`, "error");
   }
 };

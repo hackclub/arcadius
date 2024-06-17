@@ -10,7 +10,7 @@ export async function createArcadeUser(
   flowTriggeredBy: flowTriggeredByEnum
 ) {
   try {
-    metrics.increment("createArcadeUser");
+    metrics.increment("arcade.createArcadeUser");
     const tsStart = performance.now();
 
     blog(
@@ -36,15 +36,15 @@ export async function createArcadeUser(
         `Arcade user \`${name}\` created with email \`${email}\` triggered by \`${flowTriggeredBy}\``,
         "info"
       );
-      metrics.timing("createArcadeUser", performance.now() - tsStart);
+      metrics.timing("arcade.createArcadeUser", performance.now() - tsStart);
       return result;
     } else {
-      metrics.timing("createArcadeUser", performance.now() - tsStart);
+      metrics.timing("arcade.createArcadeUser", performance.now() - tsStart);
       blog(`Arcade user ${name} already exists, user NOT created.`, "info");
       return userRecord;
     }
   } catch (error) {
     blog(`Error in createArcadeUser: ${error}`, "error");
-    metrics.increment("createArcadeUser.error");
+    metrics.increment("createArcadeUser.500");
   }
 }

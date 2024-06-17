@@ -6,25 +6,25 @@ import { blog } from "../../util/Logger";
 // Only trigger for users that have joined on or after June 12th, 2024
 
 export async function getInvitationFaults() {
-  try {
-    metrics.increment("airtable.get_invitationfaults");
-    const tsStart = performance.now();
+    try {
+        metrics.increment("airtable.get_invitationfaults.200");
+        const tsStart = performance.now();
 
-    blog("Getting all users that need to be invited", "info");
+        blog("Getting all users that need to be invited", "info");
 
-    const data = await slackJoinsAirtable
-      .select({
-        filterByFormula: `NOT({Invited})`,
-      })
-      .all();
+        const data = await slackJoinsAirtable
+            .select({
+                filterByFormula: `NOT({Invited})`,
+            })
+            .all();
 
-    metrics.timing(
-      "airtable.get_invitationfaults",
-      performance.now() - tsStart
-    );
-    return data;
-  } catch (error) {
-    blog(`Error in getInvitationFaults: ${error}`, "error");
-    metrics.increment("airtable.get_invitationfaults.error");
-  }
+        metrics.timing(
+            "airtable.get_invitationfaults",
+            performance.now() - tsStart
+        );
+        return data;
+    } catch (error) {
+        blog(`Error in getInvitationFaults: ${error}`, "error");
+        metrics.increment("airtable.get_invitationfaults.500");
+    }
 }

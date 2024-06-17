@@ -4,7 +4,6 @@ import { blog } from "../../util/Logger";
 
 async function inviteGuestToSlack({ email, channels }) {
   try {
-    metrics.increment("http.request.api_users-admin-inviteGuestToSlack");
     const startTs = performance.now();
 
     blog(`Inviting ${email} to Slack...`, "info");
@@ -47,13 +46,19 @@ async function inviteGuestToSlack({ email, channels }) {
       result = false;
     } finally {
       if (result) {
+        metrics.increment(
+            "http.request.api_users-admin-inviteGuestToSlack.200"
+        );
         metrics.timing(
-          "http.requests.api_users-admin-inviteGuestToSlack.200",
+          "http.request.api_users-admin-inviteGuestToSlack",
           performance.now() - startTs
         );
       } else {
+        metrics.increment(
+            "http.request.api_users-admin-inviteGuestToSlack.404"
+        );
         metrics.timing(
-          "http.requests.api_users-admin-inviteGuestToSlack.400",
+          "http.request.api_users-admin-inviteGuestToSlack",
           performance.now() - startTs
         );
       }
@@ -61,7 +66,7 @@ async function inviteGuestToSlack({ email, channels }) {
     }
   } catch (error) {
     blog(`Error in inviteGuestToSlack: ${error}`, "error");
-    metrics.increment("http.request.api_users-admin-inviteGuestToSlack.error");
+    metrics.increment("http.request.api_users-admin-inviteGuestToSlack.500");
   }
 }
 

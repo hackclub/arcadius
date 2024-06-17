@@ -67,7 +67,7 @@ app.event(/.*/, async ({ event, client }) => {
     }
   } catch (error) {
     blog(`Error in event handler: ${error}`, "error");
-    metrics.increment("slack.event.error");
+    metrics.increment("slack.event.500");
   }
 });
 
@@ -101,7 +101,7 @@ app.action(/.*?/, async (args) => {
     }
   } catch (error) {
     blog(`Error in action handler: ${error}`, "error");
-    metrics.increment("slack.action.error");
+    metrics.increment("slack.action.500");
   }
 });
 
@@ -112,7 +112,7 @@ app.command(/.*?/, async ({ ack, body, client }) => {
     // This is not used
   } catch (error) {
     blog(`Error in command handler: ${error}`, "error");
-    metrics.increment("slack.command.error");
+    metrics.increment("slack.command.500");
   }
 });
 

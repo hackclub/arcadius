@@ -19,11 +19,11 @@ export async function slackInviteEndpoint(req, res) {
       // @ts-ignore
       result.error = error;
       metrics.increment(
-        ok ? "slackInviteEndpoint.success" : "slackInviteEndpoint.error"
+        ok ? "slackInviteEndpoint.200" : "slackInviteEndpoint.500"
       );
       blog(`${result}`, "info");
     } else {
-      metrics.increment("slackInviteEndpoint.error");
+      metrics.increment("slackInviteEndpoint.500");
       // @ts-ignore
       result.ok = false;
       // @ts-ignore
