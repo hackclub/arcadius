@@ -68,7 +68,7 @@ async function postRacoonInitalInstructions(payload) {
 }
 
 async function checkOutTheShop(userId) {
-  let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
+  let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
   metrics.increment("http.request.api_chat-postmessage");
   await client.chat.postMessage({
@@ -90,7 +90,7 @@ async function checkOutTheShop(userId) {
 async function sendAlreadyVerifiedDM(userId) {
   metrics.increment("http.request.api_chat-postmessage");
 
-  let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
+  let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
   let email = await client.users.info({
     user: userId,
@@ -113,7 +113,26 @@ async function sendAlreadyVerifiedDM(userId) {
   });
 }
 
-async function sendFirstPurchaseSubmittedDM(userId) {
+// async function sendFirstPurchaseSubmittedDM(userId) {
+//   metrics.increment("http.request.api_chat-postmessage");
+
+//   let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
+
+//   await client.chat.postMessage({
+//     channel: dmChannel,
+//     blocks: [
+//       {
+//         type: "section",
+//         text: {
+//           type: "mrkdwn",
+//           text: t("onboarding.step_three", {}),
+//         },
+//       },
+//     ],
+//   });
+// }
+
+async function sendUpgradedDM(userId) {
   metrics.increment("http.request.api_chat-postmessage");
 
   let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
@@ -125,26 +144,8 @@ async function sendFirstPurchaseSubmittedDM(userId) {
         type: "section",
         text: {
           type: "mrkdwn",
+          // correct!
           text: t("onboarding.step_three", {}),
-        },
-      },
-    ],
-  });
-}
-
-async function sendUpgradedDM(userId) {
-  metrics.increment("http.request.api_chat-postmessage");
-
-  let dmChannel = await getDmChannelFromAirtable({ slackId: userId });
-
-  await client.chat.postMessage({
-    channel: dmChannel,
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          text: t("onboarding.accept_coc", {}),
         },
       },
       {
@@ -170,7 +171,7 @@ export {
   checkOutTheShop,
   postRacoonInitalInstructions,
   sendAlreadyVerifiedDM,
-  sendFirstPurchaseSubmittedDM,
+  // sendFirstPurchaseSubmittedDM,
   sendInitalDM,
   sendUpgradedDM,
 };

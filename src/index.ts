@@ -16,6 +16,7 @@ import { createArcadeUser } from "./functions/airtable/createArcadeUser";
 import { checkUserHours } from "./functions/polling/checkUserHours";
 import { pollFirstPurchaseUsers } from "./functions/polling/pollFirstPurchaseUsers";
 import { pollVerifications } from "./functions/polling/pollVerifications";
+import { getDmChannelFromAirtable } from "./functions/slack/getDmChannelFromAirtable";
 import { removeOldHakoonButton } from "./functions/slack/removeOldButtons";
 import {
   postRacoonInitalInstructions,
@@ -83,7 +84,12 @@ app.action(/.*?/, async (args) => {
     case "accept_coc":
       metrics.increment("slack.action.accept_coc");
       // FIXME: this needs to be confitional based on if the user came through the flow through arcadius
-      await promoteSlackUser(user);
+      let dmChannel = await getDmChannelFromAirtable({ slackId: user! });
+      await promoteSlackUser(user!);
+      await client.chat.postMessage({
+        channel: dmChannel,
+        text: t("onboarding.paridise", {}),
+      });
       break;
   }
 });

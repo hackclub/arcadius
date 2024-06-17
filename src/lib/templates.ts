@@ -7,7 +7,8 @@ type template =
   | "onboarding.hedi_intro"
   | "onboarding.shop_prompt"
   | "onboarding.step_three"
-  | "onboarding.accept_coc";
+  | "onboarding.accept_coc"
+  | "onboarding.paridise";
 
 interface data {
   slackId?: string;
