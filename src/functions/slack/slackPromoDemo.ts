@@ -22,7 +22,7 @@ export async function promoteSlackUser(userID) {
   form.append("user", userID);
 
   await fetch(`https://hackclub.slack.com/api/users.admin.setRegular`, {
-    headers: { cookie },
+    headers: { cookie, "User-Agent": "jasper@hacklub.com" },
     body: form,
     method: "POST",
   })
@@ -47,7 +47,7 @@ export async function demoteSlackUser(userID) {
   form.append("target_team", "T0266FRGM");
 
   await fetch("https://hackclub.slack.com/api/users.admin.setRestricted", {
-    headers: { cookie },
+    headers: { cookie, "User-Agent": "jasper@hacklub.com" },
     body: form,
     method: "POST",
   })

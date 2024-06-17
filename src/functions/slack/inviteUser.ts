@@ -17,6 +17,7 @@ async function inviteGuestToSlack({ email, channels }) {
       "https://hackclub.slack.com/api/users.admin.inviteBulk?_x_id=4bb6e5fd-1718545332.127&_x_csid=6o5yvrsGhgU&slack_route=T0266FRGM&_x_version_ts=1718412469&_x_frontend_build_type=current&_x_desktop_ia=4&_x_gantry=true&fp=51&_x_num_retries=0",
       {
         headers: {
+          "User-Agent": "jasper@hacklub.com",
           accept: "*/*",
           "accept-language": "en-US,en;q=0.9",
           "content-type":
