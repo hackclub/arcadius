@@ -9,7 +9,7 @@ export async function getDmChannelEndpoint(req: Request, res: Response) {
     const userId = req.query.userId;
 
     const tsStart = Date.now();
-    blog(`getDmChannelEndpoint: userId: ${userId}`, "info");
+    blog(`getDmChannelEndpoint: userId: ${userId} (<@${userId}>)`, "info");
 
     if (!userId) {
       blog(`getDmChannelEndpoint: userId is require (slack user id)`, "error");
