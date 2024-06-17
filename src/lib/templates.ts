@@ -7,6 +7,7 @@ type template =
   | "onboarding.hedi_intro"
   | "onboarding.shop_prompt"
   | "onboarding.step_three"
+  | "onboarding.step_three_preexisting"
   | "onboarding.accept_coc"
   | "onboarding.paridise";
 
