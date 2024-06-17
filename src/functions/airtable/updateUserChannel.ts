@@ -6,7 +6,7 @@ export async function updateUserChannel(slackId, channelId) {
   try {
     metrics.increment("airtable.update_userchannel");
     const tsStart = performance.now();
-    blog(`Updating user ${slackId} with channel ${channelId}`, "info");
+    blog(`Updating user <@${slackId}> with channel <#${channelId}>`, "info");
     try {
       const user = (
         await hoursAirtable
@@ -18,10 +18,10 @@ export async function updateUserChannel(slackId, channelId) {
           dmChannel: channelId,
         });
         performance.now() - tsStart;
-        blog(`User ${slackId} updated with channel ${channelId}`, "info");
+        blog(`User <@${slackId}> updated with channel <#${channelId}>`, "info");
       }
     } catch (err) {
-      blog(`Error updating user ${slackId} with channel ${channelId}`, "error");
+      blog(`Error updating user <@${slackId}> with channel <#${channelId}>`, "error");
       metrics.increment("airtable.update_userchannel.error");
     }
   } catch (error) {
