@@ -130,7 +130,7 @@ receiver.router.post(
       console.log(`Creating arcade user for ${userId}`);
       const user = (await client.users.info({ user: userId })).user;
       try {
-        let triggeredBy: flowTriggeredByEnum = flowTriggeredByEnum.hedi;
+        let triggeredBy: flowTriggeredByEnum = flowTriggeredByEnum.arcadius;
 
         const arcadeUser = await createArcadeUser(
           userId,
