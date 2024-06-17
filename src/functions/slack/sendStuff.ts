@@ -7,6 +7,7 @@ import { blog } from "../../util/Logger";
 import { sleep } from "../../util/sleep";
 import { updateUserChannel } from "../airtable/updateUserChannel";
 import { getDmChannelFromAirtable } from "./getDmChannelFromAirtable";
+import { flowTriggeredByEnum } from "../../types/flowTriggeredBy";
 
 const haccoonId = "U078FB76K5F";
 
@@ -170,7 +171,8 @@ async function sendUpgradedDM(userId) {
       .firstPage();
 
     const dmChannel = userRecord[0].get("dmChannel");
-    const preexisting = userRecord[0].get("Flow Triggered By") === "Heidi";
+    const preexisting =
+      userRecord[0].get("Flow Triggered By") === flowTriggeredByEnum.hedi;
 
     if (preexisting) {
       await client.chat.postMessage({
