@@ -237,7 +237,7 @@ new CronJob(
 // );
 
 new CronJob(
-  "*/28 * * * * *",
+  "*/8 * * * * *",
   async function () {
     logger("Checking for users with more than minimum hours.", "cron");
     await checkUserHours();
@@ -249,7 +249,7 @@ new CronJob(
 
 // FIXME: This needs to be slow enough to not hit before the slack invite is sent reguarly
 new CronJob(
-  "*/30 * * * * *",
+  "*/15 * * * * *",
   async function () {
     // logger("Checking for slack invitation faults.", "cron");
     // DO NOT UNCOMMENT THIS RIGHT NOW!!!!!!!!!!!!!! (Remeber to reenable slack joins base access on the token)
@@ -261,7 +261,7 @@ new CronJob(
 );
 
 new CronJob(
-  "*/31 * * * * *",
+  "*/10 * * * * *",
   async function () {
     logger("Polling for first purchase users.", "cron");
     await pollFirstPurchaseUsers();
@@ -272,7 +272,7 @@ new CronJob(
 );
 
 new CronJob(
-  "*/25 * * * * *",
+  "*/10 * * * * *",
   async function () {
     logger("Polling for verified users.", "cron");
     await pollVerifications();
