@@ -5,6 +5,7 @@ import metrics from "../../metrics";
 import { sleep } from "../../util/sleep";
 import { updateUserChannel } from "../airtable/updateUserChannel";
 import { getDmChannelFromAirtable } from "./getDmChannelFromAirtable";
+import { hoursAirtable } from "../../lib/airtable";
 
 const haccoonId = "U078FB76K5F";
 
@@ -135,36 +136,59 @@ async function sendAlreadyVerifiedDM(userId) {
 async function sendUpgradedDM(userId) {
   metrics.increment("http.request.api_chat-postmessage");
 
-  let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
+  // let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
-  await client.chat.postMessage({
-    channel: dmChannel,
-    blocks: [
-      {
-        type: "section",
-        text: {
-          type: "mrkdwn",
-          // correct!
-          text: t("onboarding.step_three", {}),
-        },
-      },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "I accept",
-              emoji: true,
-            },
-            action_id: "accept_coc",
-            value: dmChannel,
+  const userRecord = await hoursAirtable
+    .select({ filterByFormula: `{Slack ID} = '${userId}'`, pageSize: 1 })
+    .firstPage();
+
+  const dmChannel = userRecord[0].get("dmChannel");
+  const preexisting = userRecord[0].get("Flow Triggered By") === "Heidi";
+
+  if (preexisting) {
+    await client.chat.postMessage({
+      channel: dmChannel,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            // correct!
+            text: t("onboarding.step_three", {}),
           },
-        ],
-      },
-    ],
-  });
+        },
+        {
+          type: "actions",
+          elements: [
+            {
+              type: "button",
+              text: {
+                type: "plain_text",
+                text: "Upgrade!",
+                emoji: true,
+              },
+              action_id: "accept_coc",
+              value: dmChannel,
+            },
+          ],
+        },
+      ],
+    });
+  } else {
+    await client.chat.postMessage({
+      channel: dmChannel,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            // correct!
+            text: t("onboarding.step_three_preexisting", {}),
+          },
+        },
+      ],
+    });
+  }
 }
 
 export {

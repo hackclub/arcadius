@@ -32,15 +32,26 @@ onboarding:
     *To spend your tickets, run `/shop`*
 
   step_three: |-
-    You have _arrived._ Step 3 is complete, your prize is on its way :gift:
+    _*:tada: Step 3 is complete, your prize is on its way :gift:*_
 
     1. *Join the Slack ✓*
     2. *Hack on Projects ✓* (`/arcade`)
     3. *Get Cool Stuff ✓* (`/shop`)
 
-    This is just the beginning. You have all summer to keep logging hours and claiming prizes! The Arcade closes on August 31st.
+    This is just the beginning. You have all summer to keep earning minutes and claiming prizes! The Arcade closes on August 31st.
 
-    And with that… you're ready to be a full member of Hack Club!
+    Now let's upgrade you to a full member of Hack Club!
+
+  step_three_preexisting: |-
+    _*:tada: Step 3 is complete, your prize is on its way :gift:*_
+
+    1. *Join the Slack ✓*
+    2. *Hack on Projects ✓* (`/arcade`)
+    3. *Get Cool Stuff ✓* (`/shop`)
+
+    This is just the beginning. You have all summer to keep earning minutes and claiming prizes! The Arcade closes on August 31st.
+
+    There are a ton of details we couldn't cover in this tutorial. <https://hack.club/yt-arcade|Watch this> to fill in a few of the gaps!
 
   accept_coc: |-
     Welcome to the Hack Club Arcade! :summer::joystick:
@@ -50,7 +61,9 @@ onboarding:
   paridise: |-
     Welcome to paradise! :palm_tree: You've made it to the Hack Club Arcade! :summer::joystick:
 
-    <https://hack.club/yt-arcade|Watch this>
+    The Hack Club Slack is _huge_, and it can be a bit overwhelming at first. Everyone is super friendly and will do their best to answer any questions! <https://hackclub.slack.com/canvas/C01AS1YEM8A|This directory> is the closest thing we have to a map… good luck out there!
+
+    There are also a ton of Arcade details we couldn't cover in this tutorial. <https://hack.club/yt-arcade|Watch this> to fill in a few of those gaps!
 
 test:
   - "This is a test message"
