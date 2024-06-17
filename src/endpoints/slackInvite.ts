@@ -21,7 +21,7 @@ export async function slackInviteEndpoint(req, res) {
       metrics.increment(
         ok ? "slackInviteEndpoint.success" : "slackInviteEndpoint.error"
       );
-      blog(`${result}`, "info");
+      blog(`${JSON.stringify(result, null, 4)}`, "info");
     } else {
       metrics.increment("slackInviteEndpoint.error");
       // @ts-ignore
