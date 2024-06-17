@@ -11,10 +11,15 @@ export async function getFirstPurchaseUsers() {
   const data = await hoursAirtable
     .select({
       filterByFormula: `AND({Order Count} = 1, NOT({firstPurchaseSubmitted}))`,
-        // filterByFormula: `{Order Count} = 1`,
-
+      // filterByFormula: `{Order Count} = 1`,
     })
     .all();
+
+  console.log("LOGGING DATA");
+  // console.log(data);
+  // if (data) {
+  //   console.log(data[0]["fields"]);
+  // }
 
   metrics.timing(
     "airtable.get_firstpurchaseusers",

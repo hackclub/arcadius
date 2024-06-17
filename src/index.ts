@@ -82,6 +82,7 @@ app.action(/.*?/, async (args) => {
       break;
     case "accept_coc":
       metrics.increment("slack.action.accept_coc");
+      // FIXME: this needs to be confitional based on if the user came through the flow through arcadius
       await promoteSlackUser(user);
       break;
   }

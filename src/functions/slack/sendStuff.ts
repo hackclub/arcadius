@@ -2,6 +2,7 @@ import axios from "axios";
 import { client } from "../../index";
 import { t } from "../../lib/templates";
 import metrics from "../../metrics";
+import { sleep } from "../../util/sleep";
 import { updateUserChannel } from "../airtable/updateUserChannel";
 import { getDmChannelFromAirtable } from "./getDmChannelFromAirtable";
 
@@ -16,6 +17,8 @@ async function sendInitalDM(userId) {
     .then((res) => res.channel.id);
 
   await updateUserChannel(userId, channel);
+
+  await sleep(10000);
 
   await client.chat.postMessage({
     channel,
@@ -77,7 +80,7 @@ async function checkOutTheShop(userId) {
         type: "section",
         text: {
           type: "mrkdwn",
-          text: t("onboarding.check_out_shop", {}),
+          text: t("onboarding.shop_prompt", {}),
         },
       },
     ],
@@ -102,8 +105,8 @@ async function sendAlreadyVerifiedDM(userId) {
       {
         type: "section",
         text: {
-          type: 'mrkdwn',
-          text: t('onboarding.step_three', {}),
+          type: "mrkdwn",
+          text: t("onboarding.shop_prompt", {}),
         },
       },
     ],
@@ -121,8 +124,8 @@ async function sendFirstPurchaseSubmittedDM(userId) {
       {
         type: "section",
         text: {
-          type: 'mrkdwn',
-          text: t('onboarding.step_three', {}),
+          type: "mrkdwn",
+          text: t("onboarding.step_three", {}),
         },
       },
     ],

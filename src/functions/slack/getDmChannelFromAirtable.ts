@@ -55,5 +55,9 @@ export async function getDmChannelFromAirtable(params: Identifier) {
       throw new Error("Either slackId, email, or internalId must be provided");
   }
 
+  console.log("get dm channel from airtable");
+  console.log("Params: ", params);
+  console.log("DM Channel: ", dmChannel);
+
   return dmChannel;
 }

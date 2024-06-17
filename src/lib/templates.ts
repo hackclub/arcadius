@@ -2,12 +2,12 @@ import fs from "fs";
 import { parse } from "yaml";
 
 type template =
-  | 'app.startup'
-  | 'onboarding.welcome_hacker'
-  | 'onboarding.hedi_intro'
-  | 'onboarding.check_out_shop'
-  | 'onboarding.step_three'
-  | 'onboarding.accept_coc'
+  | "app.startup"
+  | "onboarding.welcome_hacker"
+  | "onboarding.hedi_intro"
+  | "onboarding.shop_prompt"
+  | "onboarding.step_three"
+  | "onboarding.accept_coc";
 
 interface data {
   slackId?: string;

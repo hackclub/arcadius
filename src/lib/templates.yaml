@@ -20,7 +20,7 @@ onboarding:
     _…twitch…_
 
     anyway, Arcade?? try it try it!!
-    *type `/hack` and send it!!*
+    *type `/arcade` and send it!!*
 
   shop_prompt: |-
     Good job with Step 2! When you earn minutes for real, there's one more step where you have to exchange those minutes for tickets. We can go over that later though… for now, here's 3 free tickets so you can skip to the good part.
@@ -51,4 +51,4 @@ onboarding:
     Welcome to paradise! :palm_tree: You've made it to the Hack Club Arcade! :summer::joystick:
 
 test:
-  - 'This is a test message'
+  - "This is a test message"
