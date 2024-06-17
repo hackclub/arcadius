@@ -174,6 +174,8 @@ async function sendUpgradedDM(userId) {
     const preexisting =
       userRecord[0].get("Flow Triggered By") === flowTriggeredByEnum.hedi;
 
+    console.log("preexisting", preexisting, userRecord.fields);
+
     if (!preexisting) {
       await client.chat.postMessage({
         channel: dmChannel,
