@@ -14,7 +14,7 @@ const haccoonId = "U078FB76K5F";
 async function sendInitalDM(userId) {
   try {
     metrics.increment("http.request.api_chat-postmessage");
-    blog(`Sending initial DM to ${userId}`, "info");
+    blog(`Sending initial DM to <@${userId}>`, "info");
     const channel = await client.conversations
       .open({
         users: [userId, haccoonId].join(","),
@@ -86,7 +86,7 @@ async function checkOutTheShop(userId) {
     let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
     metrics.increment("http.request.api_chat-postmessage");
-    blog(`Checking out the shop with ${userId}`, "info");
+    blog(`Checking out the shop with <@${userId}>`, "info");
 
     await client.chat.postMessage({
       channel: dmChannel,
@@ -111,7 +111,7 @@ async function checkOutTheShop(userId) {
 async function sendAlreadyVerifiedDM(userId) {
   try {
     metrics.increment("http.request.api_chat-postmessage");
-    blog(`Sending already verified DM to ${userId}`, "info");
+    blog(`Sending already verified DM to <@${userId}>`, "info");
 
     let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
@@ -162,7 +162,7 @@ async function sendAlreadyVerifiedDM(userId) {
 async function sendUpgradedDM(userId) {
   try {
     metrics.increment("http.request.api_chat-postmessage");
-    blog(`Sending upgraded DM to ${userId}`, "info");
+    blog(`Sending upgraded DM to <@${userId}>`, "info");
 
     // let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
