@@ -27,7 +27,25 @@ async function slog(logMessage, type) {
   const message = {
     channel:
       process.env.NODE_ENV === "production" ? "C077F5AVB38" : "C069N64PW4A",
-    text: logMessage,
+      text: logMessage,
+      blocks: [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": `> ${logMessage}`
+          }
+        },
+        {
+          "type": "context",
+          "elements": [
+              {
+                "type": "mrkdwn",
+                "text": `${new Date().toString()}`
+              }
+          ]
+        }
+      ]
   };
 
   messageQueue.push(message, (error) => {
