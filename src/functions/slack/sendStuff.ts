@@ -3,11 +3,11 @@ import { client } from "../../index";
 import { hoursAirtable } from "../../lib/airtable";
 import { t } from "../../lib/templates";
 import metrics from "../../metrics";
+import { flowTriggeredByEnum } from "../../types/flowTriggeredBy";
 import { blog } from "../../util/Logger";
 import { sleep } from "../../util/sleep";
+import { getDmChannelFromAirtable } from "../airtable/getDmChannelFromAirtable";
 import { updateUserChannel } from "../airtable/updateUserChannel";
-import { getDmChannelFromAirtable } from "./getDmChannelFromAirtable";
-import { flowTriggeredByEnum } from "../../types/flowTriggeredBy";
 
 const haccoonId = "U078FB76K5F";
 

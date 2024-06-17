@@ -25,11 +25,11 @@ onboarding:
   shop_prompt: |-
     Good job with Step 2! When you earn minutes for real, there's one more step where you have to exchange those minutes for tickets. We can go over that later though… for now, here's 3 free tickets so you can skip to the good part :admission_tickets::admission_tickets::admission_tickets:
 
-    1. *Join the Slack ✓*
-    2. *Hack on Projects ✓*
-    3. *Get Cool Stuff* ← _You are here_
+    1. Join the Slack ✓
+    2. Hack on Projects ✓
+    3. Get Cool Stuff ← _You are here_
 
-    *To spend your tickets, run `/shop`*
+    :arrow_right: *To spend your tickets, run `/shop`* :arrow_left:
 
   step_three: |-
     _*:tada: Step 3 is complete, your prize is on its way :gift:*_
