@@ -174,6 +174,7 @@ async function sendUpgradedDM(userId) {
     const preexisting =
       userRecord[0].get("Flow Triggered By") === flowTriggeredByEnum.hedi;
 
+    // @ts-ignore
     console.log("preexisting", preexisting, userRecord.fields);
 
     if (!preexisting) {
