@@ -5,7 +5,7 @@ import { blog } from "../../util/Logger";
 export async function addToArcadeChannels(slackId) {
   try {
     metrics.increment("slack.add_to_arcade_channels");
-    blog(`Adding user ${slackId} to arcade channels`, "info");
+    blog(`Adding user <@${slackId}> to arcade channels`, "info");
 
     const channels = [
       "C01504DCLVD", // #scrapbook

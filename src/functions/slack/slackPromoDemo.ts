@@ -18,7 +18,7 @@ const cookie = `d=${xoxd}`;
 
 export async function promoteSlackUser(userID) {
   try {
-    blog(`Promoting user ${userID}`, "info");
+    blog(`Promoting user <@${userID}>`, "info");
 
     // promote
     let form = new URLSearchParams();
