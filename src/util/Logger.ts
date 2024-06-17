@@ -39,6 +39,11 @@ export const clog = async (logMessage, type: LogType) => {
   }
 };
 
+export const blog = async (logMessage, type: LogType) => {
+  slog(logMessage, type);
+  clog(logMessage, type);
+};
+
 export { clog as default, slog };
 
 // # LOG_CHANNEL= "C077F5AVB38", # Prod Logging

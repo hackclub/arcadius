@@ -1,10 +1,18 @@
-import logger from "../../util/Logger";
+import metrics from "../../metrics";
+import logger, { blog } from "../../util/Logger";
 import { getInvitationFaults } from "../airtable/getInvitationFaults";
-
 
 export async function pollInvitationFaults() {
   try {
+    metrics.increment("airtable.poll_invitationfaults");
+    blog("Polling invitation faults", "info");
+
     const uninvitedUsers = await getInvitationFaults();
+
+    if (!uninvitedUsers) {
+      logger("No uninvited users found.", "info");
+      return;
+    }
 
     uninvitedUsers
       .map((record) => record)
@@ -16,6 +24,7 @@ export async function pollInvitationFaults() {
         // });
       });
   } catch (err) {
-    logger(`Error polling invitation faults: ${err}`, "error");
+    blog(`Error polling invitation faults: ${err}`, "error");
+    metrics.increment("airtable.poll_invitationfaults.error");
   }
 }

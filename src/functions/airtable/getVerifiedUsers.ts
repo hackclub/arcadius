@@ -1,19 +1,31 @@
 import metrics from "../../metrics";
+import { blog } from "../../util/Logger";
 import { getVerificationsUsers } from "./getVerificationsUsers";
 
-
 export async function getVerifiedUsers() {
-  metrics.increment("airtable.get_verifiedusers");
-  const tsStart = performance.now();
+  try {
+    metrics.increment("airtable.get_verifiedusers");
+    const tsStart = performance.now();
 
-  const data = await getVerificationsUsers().then((users) => {
-    let verifiedUsers = users.filter(
-      (user) => user["Verification Status"] === "Eligible L1" ||
-        user["Verification Status"] === "Eligible L2"
-    );
-    return verifiedUsers;
-  });
+    blog("Getting all verified users", "info");
 
-  metrics.timing("airtable.get_verifiedusers", performance.now() - tsStart);
-  return data;
+    const data = await getVerificationsUsers().then((users) => {
+      if (!users) {
+        return [];
+      }
+
+      let verifiedUsers = users.filter(
+        (user) =>
+          user["Verification Status"] === "Eligible L1" ||
+          user["Verification Status"] === "Eligible L2"
+      );
+      return verifiedUsers;
+    });
+
+    metrics.timing("airtable.get_verifiedusers", performance.now() - tsStart);
+    return data;
+  } catch (error) {
+    blog(`Error in getVerifiedUsers: ${error}`, "error");
+    metrics.increment("airtable.get_verifiedusers.error");
+  }
 }

@@ -1,6 +1,7 @@
 import { hoursAirtable } from "../../lib/airtable";
+import metrics from "../../metrics";
 import { flowTriggeredByEnum } from "../../types/flowTriggeredBy";
-import { slog } from "../../util/Logger";
+import { blog } from "../../util/Logger";
 
 export async function createArcadeUser(
   slackId,
@@ -8,33 +9,42 @@ export async function createArcadeUser(
   name,
   flowTriggeredBy: flowTriggeredByEnum
 ) {
-  slog(
-    `Creating Arcade user \`${name}\` with email \`${email}\` triggered by \`${flowTriggeredBy}\``,
-    "info"
-  );
-  const userRecord = (
-    await hoursAirtable
-      .select({ filterByFormula: `{Slack ID} = '${slackId}'` })
-      .all()
-  ).at(0);
+  try {
+    metrics.increment("createArcadeUser");
+    const tsStart = performance.now();
 
-  if (!userRecord) {
-    // @ts-ignore
-    const result = await hoursAirtable.create({
-      "Slack ID": slackId,
-      Email: email,
-      Name: name,
-      "Flow Triggered By": flowTriggeredBy,
-      "Initial Banked Minutes": 180,
-    });
-    slog(
-      `Arcade user \`${name}\` created with email \`${email}\` triggered by \`${flowTriggeredBy}\``,
+    blog(
+      `Creating Arcade user \`${name}\` with email \`${email}\` triggered by \`${flowTriggeredBy}\``,
       "info"
     );
-    return result;
-  } else {
-    console.log("User already exists!");
-    slog(`Arcade user ${name} already exists, user NOT created.`, "info");
-    return userRecord;
+    const userRecord = (
+      await hoursAirtable
+        .select({ filterByFormula: `{Slack ID} = '${slackId}'` })
+        .all()
+    ).at(0);
+
+    if (!userRecord) {
+      // @ts-ignore
+      const result = await hoursAirtable.create({
+        "Slack ID": slackId,
+        Email: email,
+        Name: name,
+        "Flow Triggered By": flowTriggeredBy,
+        "Initial Banked Minutes": 180,
+      });
+      blog(
+        `Arcade user \`${name}\` created with email \`${email}\` triggered by \`${flowTriggeredBy}\``,
+        "info"
+      );
+      metrics.timing("createArcadeUser", performance.now() - tsStart);
+      return result;
+    } else {
+      metrics.timing("createArcadeUser", performance.now() - tsStart);
+      blog(`Arcade user ${name} already exists, user NOT created.`, "info");
+      return userRecord;
+    }
+  } catch (error) {
+    blog(`Error in createArcadeUser: ${error}`, "error");
+    metrics.increment("createArcadeUser.error");
   }
 }

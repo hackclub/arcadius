@@ -1,21 +1,31 @@
 import { verificationsAirtable } from "../../lib/airtable";
 import metrics from "../../metrics";
-
+import { blog } from "../../util/Logger";
 
 export async function getVerificationsUsers() {
-  metrics.increment("airtable.get_verificationusers");
-  const tsStart = performance.now();
+  try {
+    metrics.increment("airtable.get_verificationusers");
+    const tsStart = performance.now();
 
-  let users = await verificationsAirtable
-    .select({
-      // fields: ["Name", "Internal ID", "Slack ID", "Email", "Minutes "]
-    })
-    .all();
+    blog("Getting all users that need to be verified", "info");
 
-  let usersMap = await users.map((record) => {
-    return record.fields;
-  });
+    let users = await verificationsAirtable
+      .select({
+        // fields: ["Name", "Internal ID", "Slack ID", "Email", "Minutes "]
+      })
+      .all();
 
-  metrics.timing("airtable.get_verificationusers", performance.now() - tsStart);
-  return usersMap;
+    let usersMap = await users.map((record) => {
+      return record.fields;
+    });
+
+    metrics.timing(
+      "airtable.get_verificationusers",
+      performance.now() - tsStart
+    );
+    return usersMap;
+  } catch (error) {
+    blog(`Error in getVerificationsUsers: ${error}`, "error");
+    metrics.increment("airtable.get_verificationusers.error");
+  }
 }
