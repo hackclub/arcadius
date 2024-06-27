@@ -148,6 +148,8 @@ async function sendFirstPurchaseSubmittedDM(userId) {
 
     await client.chat.postMessage({
       channel: dmChannel,
+      unfurl_links: false,
+      unfurl_media: false,
       blocks: [
         {
           type: "section",
