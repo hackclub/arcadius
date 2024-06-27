@@ -4,7 +4,7 @@ import { sendUpgradedDM } from "../slack/sendStuff";
 
 export async function pollVerifications() {
   try {
-    blog("Polling for users who have just made their first purchase", "info");
+    blog("Polling for users who have just completed verification", "info");
 
     const data = await hoursAirtable
       .select({
