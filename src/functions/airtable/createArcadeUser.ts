@@ -22,6 +22,7 @@ export async function createArcadeUser(
         .select({ filterByFormula: `{Slack ID} = '${slackId}'` })
         .all()
     ).at(0);
+    console.log("ALOHA COMRADES");
 
     if (!userRecord) {
       // @ts-ignore
