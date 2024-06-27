@@ -30,6 +30,11 @@ export async function pollFirstPurchaseUsers() {
         } else {
           // if they don't, send the verification DM
           const slackId = record.get("Slack ID");
+          console.log(
+            "This is where we would send something to Slack ID ",
+            slackId
+          );
+          return;
           if (slackId === "UDK5M9Y13" && !record.get("Arcade Eligible"))
             sendFirstPurchaseSubmittedDM(slackId);
           // set the verificationDM field to true
