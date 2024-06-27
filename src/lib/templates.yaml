@@ -14,7 +14,7 @@ onboarding:
     Hack Club is a rather _big_ place, this Arcade is just one little piece of it. I would show you around, but these old dinosaur bones don’t move like they used to…
 
     My dear friend <@U078FB76K5F> can give you a tour though!
-
+    
     And just a heads-up… raccoons are small, and there are many of you. She is struggling with the load. Please be patient :rac_peefest:
   hedi_intro: |-
     _scurry scurry…_ oh hey wow, new frennd!! hey check out this neat piece of garbage i found, smells rul tasty right right??
@@ -34,9 +34,6 @@ onboarding:
     :arrow_right: *To spend your tickets, run `/shop`* :arrow_left:
 
     (once you buy something, come back and we can keep going)
-
-  verification_prompt: |-
-    Radical, we can't wait to ship your prize! One quick thing, we gotta <https://forms.hackclub.com/t/5ytajcD57Gus?slack_id=${slackId}|make sure you're eligible> for Arcade. _(If there are any issues, you can always reuse this form)_
 
   step_three: |-
     _*:tada: Step 3 is complete, your prize is on its way :gift:*_

@@ -3,7 +3,6 @@ import { hoursAirtable } from "../../lib/airtable";
 import metrics from "../../metrics";
 import { blog } from "../../util/Logger";
 import { getFirstPurchaseUsers } from "../airtable/getFirstPurchaseUsers";
-import { sendFirstPurchaseSubmittedDM } from "../slack/sendStuff";
 // import { sendFirstPurchaseSubmittedDM } from "../slack/sendStuff";
 
 export async function pollFirstPurchaseUsers() {
@@ -25,19 +24,12 @@ export async function pollFirstPurchaseUsers() {
       return;
     } else {
       users.forEach(async (record) => {
-        // check to see if they have the finalDm field set to true
-        if (record.get("verificationDm")) {
-          return;
-        } else {
-          // if they don't, send the verification DM
-          const slackId = record.get("Slack ID");
-          if (slackId === "UDK5M9Y13" && !record.get("Arcade Eligible"))
-            sendFirstPurchaseSubmittedDM(slackId);
-          // set the verificationDM field to true
-          await hoursAirtable.update(record.id, {
-            verificationDM: true,
-          });
-        }
+        // sendFirstPurchaseSubmittedDM(record.get("Slack ID"));
+
+        // Update the associated record for this user in the hoursAirtable to set firstPurchaseSubmitted to true
+        await hoursAirtable.update(record.id, {
+          firstPurchaseSubmitted: true,
+        });
       });
     }
   } catch (error) {

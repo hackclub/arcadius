@@ -6,7 +6,6 @@ type template =
   | "onboarding.welcome_hacker"
   | "onboarding.hedi_intro"
   | "onboarding.shop_prompt"
-  | "onboarding.verification_prompt"
   | "onboarding.step_three"
   | "onboarding.step_three_preexisting"
   | "onboarding.accept_coc"
