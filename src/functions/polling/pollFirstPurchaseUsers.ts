@@ -13,10 +13,6 @@ export async function pollFirstPurchaseUsers() {
 
     const users = await getFirstPurchaseUsers();
 
-    console.log(
-      colors.bgBlack(`Users who have just made their first purchase: ${users}`)
-    );
-
     if (!users || users?.length === 0) {
       console.log(
         colors.bgBlack("No users have just made their first purchase")
