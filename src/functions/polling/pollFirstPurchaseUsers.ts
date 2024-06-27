@@ -7,6 +7,7 @@ import { sendFirstPurchaseSubmittedDM } from "../slack/sendStuff";
 
 export async function pollFirstPurchaseUsers() {
   console.log("This is where you would see first purchases polled for");
+
   return;
 
   try {
