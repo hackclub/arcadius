@@ -24,6 +24,13 @@ export async function createArcadeUser(
     ).at(0);
     console.log("ALOHA COMRADES");
 
+    console.log({
+      userRecord,
+      slackId,
+      email,
+      name,
+      flowTriggeredBy,
+    })
     if (!userRecord) {
       // @ts-ignore
       const result = await hoursAirtable.create({
