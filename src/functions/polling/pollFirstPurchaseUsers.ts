@@ -6,10 +6,6 @@ import { getFirstPurchaseUsers } from "../airtable/getFirstPurchaseUsers";
 import { sendFirstPurchaseSubmittedDM } from "../slack/sendStuff";
 
 export async function pollFirstPurchaseUsers() {
-  console.log("This is where you would see first purchases polled for");
-
-  return;
-
   try {
     metrics.increment("polling.poll_firstpurchaseusers");
 
