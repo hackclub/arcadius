@@ -16,8 +16,6 @@ export async function pollInvitationFaults() {
       return;
     }
 
-    console.log("Uninvited Users:", uninvitedUsers);
-
     uninvitedUsers
       .map((record) => record)
       .forEach((record) => {

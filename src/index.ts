@@ -28,6 +28,7 @@ import metrics from "./metrics";
 import { flowTriggeredByEnum } from "./types/flowTriggeredBy";
 import logger, { blog, slog } from "./util/Logger";
 import { protectAtAllCosts } from "./util/middlewear/auth";
+import { pollInvitationFaults } from "./functions/polling/pollInvitationFaults";
 
 const receiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET!,
@@ -251,9 +252,9 @@ new CronJob(
 new CronJob(
   "*/15 * * * * *",
   async function () {
-    // logger("Checking for slack invitation faults.", "cron");
+    logger("Checking for slack invitation faults.", "cron");
     // DO NOT UNCOMMENT THIS RIGHT NOW!!!!!!!!!!!!!! (Remeber to reenable slack joins base access on the token)
-    // await pollInvitationFaults();
+    await pollInvitationFaults();
   },
   null,
   true,
