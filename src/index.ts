@@ -264,8 +264,8 @@ new CronJob(
 new CronJob(
   "*/10 * * * * *",
   async function () {
-    logger("Polling for first purchase users.", "cron");
-    await pollFirstPurchaseUsers();
+    // logger("Polling for first purchase users.", "cron");
+    // await pollFirstPurchaseUsers();
   }, // onTick
   null, // onComplete
   true, // start
