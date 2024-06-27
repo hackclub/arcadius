@@ -140,24 +140,29 @@ async function sendAlreadyVerifiedDM(userId) {
   }
 }
 
-// async function sendFirstPurchaseSubmittedDM(userId) {
-//   metrics.increment("http.request.api_chat-postmessage");
+async function sendFirstPurchaseSubmittedDM(userId) {
+  try {
+    metrics.increment("http.request.api_chat-postmessage");
 
-//   let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
+    let dmChannel = await getDmChannelFromAirtable({ slackId: userId! });
 
-//   await client.chat.postMessage({
-//     channel: dmChannel,
-//     blocks: [
-//       {
-//         type: "section",
-//         text: {
-//           type: "mrkdwn",
-//           text: t("onboarding.step_three", {}),
-//         },
-//       },
-//     ],
-//   });
-// }
+    await client.chat.postMessage({
+      channel: dmChannel,
+      blocks: [
+        {
+          type: "section",
+          text: {
+            type: "mrkdwn",
+            text: t("onboarding.verification_prompt", { slackId: userId! }),
+          },
+        },
+      ],
+    });
+  } catch (error) {
+    blog(`Error in sendFirstPurchaseSubmittedDM: ${error}`, "error");
+    metrics.increment("slack.send_first_purchase_submitted_dm.error");
+  }
+}
 
 async function sendUpgradedDM(userId) {
   try {
@@ -228,7 +233,7 @@ export {
   checkOutTheShop,
   postRacoonInitalInstructions,
   sendAlreadyVerifiedDM,
-  // sendFirstPurchaseSubmittedDM,
+  sendFirstPurchaseSubmittedDM,
   sendInitalDM,
   sendUpgradedDM,
 };
