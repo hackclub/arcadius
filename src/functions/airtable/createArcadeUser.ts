@@ -45,6 +45,7 @@ export async function createArcadeUser(
       return userRecord;
     }
   } catch (error) {
+    console.log(error)
     blog(`Error in createArcadeUser: ${error}`, "error");
     metrics.increment("createArcadeUser.error");
   }
