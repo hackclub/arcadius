@@ -35,7 +35,7 @@ export async function pollFirstPurchaseUsers() {
 
           // set the verificationDM field to true
           await hoursAirtable.update(record.id, {
-            verificationDM: "True",
+            verificationDm: "True",
           });
         }
       });
