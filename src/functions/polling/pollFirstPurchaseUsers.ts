@@ -30,7 +30,7 @@ export async function pollFirstPurchaseUsers() {
         } else {
           // if they don't, send the verification DM
           const slackId = record.get("Slack ID");
-          if (slackId === "UDK5M9Y13" && !record.get("Arcade Eligible"))
+          if (!record.get("Arcade Eligible"))
             sendFirstPurchaseSubmittedDM(slackId);
 
           // set the verificationDM field to true
@@ -38,6 +38,10 @@ export async function pollFirstPurchaseUsers() {
             verificationDm: true,
           });
         }
+
+        await hoursAirtable.update(record.id, {
+          firstPurchaseSubmitted: true,
+        });
       });
     }
   } catch (error) {
