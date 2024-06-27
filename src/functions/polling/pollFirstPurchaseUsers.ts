@@ -21,13 +21,13 @@ export async function pollFirstPurchaseUsers() {
       colors.bgBlack(`Users who have just made their first purchase: ${users}`)
     );
 
-    if (!users || users.length === 0) {
+    if (!users || users?.length === 0) {
       console.log(
         colors.bgBlack("No users have just made their first purchase")
       );
       return;
     } else {
-      users.forEach(async (record) => {
+      users?.forEach(async (record) => {
         // check to see if they have the finalDm field set to true
         if (record.get("verificationDm")) {
           return;
