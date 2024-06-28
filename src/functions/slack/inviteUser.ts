@@ -69,6 +69,7 @@ let channels = [
   "C06SBHMQU8G", // #arcade
   "C077TSWKER0", // #arcade-help
   "C07897CNC4D", // #arcade-lounge
+  "C07AXU6FCC8", // #arcade-bulletin
   "C01504DCLVD", // #scrapbook
 ];
 
