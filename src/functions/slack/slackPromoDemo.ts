@@ -56,6 +56,7 @@ export async function demoteSlackUser(userID) {
     form.append("channels", channels.join(","));
     form.append("target_team", "T0266FRGM");
 
+    // this sets as multi-channel guest (aka Restricted)
     await fetch("https://hackclub.slack.com/api/users.admin.setRestricted", {
       headers: { cookie, "User-Agent": "jasper@hacklub.com" },
       body: form,
@@ -67,5 +68,36 @@ export async function demoteSlackUser(userID) {
   } catch (error) {
     blog(`Error in demoteSlackUser: ${error}`, "error");
     metrics.increment("slack.demote_slack_user.error");
+  }
+}
+
+export async function gameOver(userID) {
+  try {
+    const channels = [
+      "C07ABG7JW69", // #game-over
+    ];
+
+    // demote
+    let form = new URLSearchParams();
+    form.append("token", xoxc);
+    form.append("user", userID);
+    form.append("channels", channels.join(","));
+    form.append("target_team", "T0266FRGM");
+
+    // this sets as single-channel guest (aka UltraRestricted)
+    await fetch(
+      "https://hackclub.slack.com/api/users.admin..setUltraRestricted",
+      {
+        headers: { cookie, "User-Agent": "jasper@hackclub.com" },
+        body: form,
+        method: "POST",
+      }
+    )
+      .then((r) => r.json())
+      .then((x) => console.log(x))
+      .catch((e) => blog(`Error in gameOver: ${e}`, "error"));
+  } catch (error) {
+    blog(`Error in gameOver: ${error}`, "error");
+    metrics.increment("slack.game_over.error");
   }
 }
