@@ -58,7 +58,7 @@ onboarding:
 
     This is just the beginning. You have all summer to keep earning minutes and claiming prizes! The Arcade closes on August 31st.
 
-    There are a ton of details we couldn't cover in this tutorial. <https://hack.club/yt-arcade|Watch this> to fill in a few of the gaps! If you ever get confused about the process, check this handy <https://cloud-a29o1kr4n-hack-club-bot.vercel.app/0untitled_artwork_31.png|guide> or post in <#C077TSWKER0>.
+    There are a ton of details we couldn't cover in this tutorial, and rules are still changing and evolving. Check the <https://github.com/hackclub/arcade-constitution|constitution> for the latest version of the rules. You can also <https://hack.club/yt-arcade|watch this> to fill in a few of the gaps, or check this handy <https://cloud-a29o1kr4n-hack-club-bot.vercel.app/0untitled_artwork_31.png|guide>—just beware, these resources are actually a little out of date! The constitution is the final authority. For live support, post in <#C077TSWKER0>.
 
   accept_coc: |-
     Welcome to the Hack Club Arcade! :summer::joystick:
@@ -70,7 +70,7 @@ onboarding:
 
     The Hack Club Slack is _huge_, and it can be a bit overwhelming at first. Everyone is super friendly and will do their best to answer any questions! <https://hackclub.slack.com/canvas/C01AS1YEM8A|This directory> is the closest thing we have to a map… good luck out there!
 
-    There are also a ton of Arcade details we couldn't cover in this tutorial. <https://hack.club/yt-arcade|Watch this> to fill in a few of those gaps! If you ever get confused about the process, check this handy <https://cloud-a29o1kr4n-hack-club-bot.vercel.app/0untitled_artwork_31.png|guide> or post in <#C077TSWKER0>.
+    There are a ton of details we couldn't cover in this tutorial, and rules are still changing and evolving. Check the <https://github.com/hackclub/arcade-constitution|constitution> for the latest version of the rules. You can also <https://hack.club/yt-arcade|watch this> to fill in a few of the gaps, or check this handy <https://cloud-a29o1kr4n-hack-club-bot.vercel.app/0untitled_artwork_31.png|guide>—just beware, these resources are actually a little out of date! The constitution is the final authority. For live support, post in <#C077TSWKER0>.
 
 test:
   - "This is a test message"
