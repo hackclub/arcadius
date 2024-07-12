@@ -58,7 +58,7 @@ onboarding:
 
     This is just the beginning. You have all summer to keep earning minutes and claiming prizes! The Arcade closes on August 31st.
 
-    There are a ton of details we couldn't cover in this tutorial, and rules are still changing and evolving. Check the <https://github.com/hackclub/arcade-constitution|constitution> for the latest version of the rules. You can also <https://hack.club/yt-arcade|watch this> to fill in a few of the gaps, or check this handy <https://cloud-a29o1kr4n-hack-club-bot.vercel.app/0untitled_artwork_31.png|guide>—just beware, these resources are actually a little out of date! The constitution is the final authority. For live support, post in <#C077TSWKER0>.
+    There are a ton of details we couldn't cover in this tutorial, and rules are still changing and evolving. Check the <https://github.com/hackclub/arcade-constitution|constitution> for the latest details on "what counts" for Arcade, and consult this handy <https://cloud-kdgz0vwr3-hack-club-bot.vercel.app/0image.png|guide> for an overview of the whole process. For live support, post in <#C077TSWKER0>!
 
   accept_coc: |-
     Welcome to the Hack Club Arcade! :summer::joystick:
@@ -68,9 +68,9 @@ onboarding:
   paridise: |-
     Welcome to paradise! :palm_tree: You've made it to the Hack Club Arcade! :summer::joystick:
 
-    The Hack Club Slack is _huge_, and it can be a bit overwhelming at first. Everyone is super friendly and will do their best to answer any questions! <https://hackclub.slack.com/canvas/C01AS1YEM8A|This directory> is the closest thing we have to a map… good luck out there!
+    The Hack Club Slack is _huge_, and it can be a bit overwhelming at first. Everyone is super friendly and will do their best to answer any questions! <https://hackclub.slack.com/canvas/C01AS1YEM8A|This directory> is the closest thing we have to a map. One last thing… *set your profile picture!* Hack Club is a community of people, not just usernames :camera_with_flash:
 
-    There are a ton of details we couldn't cover in this tutorial, and rules are still changing and evolving. Check the <https://github.com/hackclub/arcade-constitution|constitution> for the latest version of the rules. You can also <https://hack.club/yt-arcade|watch this> to fill in a few of the gaps, or check this handy <https://cloud-a29o1kr4n-hack-club-bot.vercel.app/0untitled_artwork_31.png|guide>—just beware, these resources are actually a little out of date! The constitution is the final authority. For live support, post in <#C077TSWKER0>.
+    There are a ton of details we couldn't cover in this tutorial, and rules are still changing and evolving. Check the <https://github.com/hackclub/arcade-constitution|constitution> for the latest details on "what counts" for Arcade, and consult this handy <https://cloud-kdgz0vwr3-hack-club-bot.vercel.app/0image.png|guide> for an overview of the whole process. For live support, post in <#C077TSWKER0>!
 
 test:
   - "This is a test message"
