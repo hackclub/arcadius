@@ -66,6 +66,7 @@ ${channels.join(",")}
           method: "POST",
         }
       ).then((response) => response.json());
+      console.log({ slack: data })
 
       result = data.ok;
     } catch (e) {
