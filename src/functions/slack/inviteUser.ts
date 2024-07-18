@@ -49,7 +49,7 @@ T0266FRGM
 ------WebKitFormBoundaryUFhJFSnW5IIfR4IZ
 Content-Disposition: form-data; name="channels"
 
-${channels.join(",")}
+${channels}
 ------WebKitFormBoundaryUFhJFSnW5IIfR4IZ
 `;
     let result;
