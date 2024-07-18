@@ -54,7 +54,7 @@ ${channels.join(",")}
 `;
     let result;
     try {
-      const res = await fetch(
+      const data = await fetch(
         "https://hackclub.slack.com/api/users.admin.inviteBulk",
         {
           headers: {
