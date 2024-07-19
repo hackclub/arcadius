@@ -42,7 +42,7 @@ async function sendInitalDM(userId) {
               type: "button",
               text: {
                 type: "plain_text",
-                text: "Continue…",
+                text: "👉 START 👈",
                 emoji: true,
               },
               action_id: "summon_haccoon_initial",
@@ -200,7 +200,7 @@ async function sendUpgradedDM(userId) {
                 type: "button",
                 text: {
                   type: "plain_text",
-                  text: "Upgrade!",
+                  text: "👉 UPGRADE 👈",
                   emoji: true,
                 },
                 action_id: "accept_coc",
