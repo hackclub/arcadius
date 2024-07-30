@@ -98,6 +98,7 @@ let channels = [
   "C07897CNC4D", // #arcade-lounge
   "C07AXU6FCC8", // #arcade-bulletin
   "C01504DCLVD", // #scrapbook
+  "C07AQ75CWQJ", // #arcade-shoutouts
 ];
 
 let csvChannels = channels.join(",");

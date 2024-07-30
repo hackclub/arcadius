@@ -11,6 +11,7 @@ export async function addToArcadeChannels(slackId) {
       "C01504DCLVD", // #scrapbook
       "C077TSWKER0", // #arcade-help
       "C078CMYMW4R", // #arcade-lounge
+      "C07AQ75CWQJ", // #arcade-shoutouts
     ];
 
     channels.forEach(async (channel) => {
